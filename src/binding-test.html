@@ -1,0 +1,24 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="binding-test">
+	<template>
+		<iron-ajax
+    auto
+    url="http://www.bungie.net/Platform/Destiny/Manifest"
+    headers='{"X-API-KEY": "17046260b2014770afb509a3e96a1fe2"}'
+    handle-as="text"
+    debounce-duration="300"
+    last-response="{{res}}"></iron-ajax>
+    <span>{{res}}</span>
+	</template>
+
+	<script>
+	Polymer({
+		is: "binding-test",
+		properties: {
+			res: String
+		}
+	});
+	</script>
+<dom-module>
