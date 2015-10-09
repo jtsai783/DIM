@@ -1,0 +1,57 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="dim-app">
+	<template>
+		<my-inventory membership-type="{{membershipType}}"
+		              destiny-membership-id="{{destinyMembershipId}}">
+		</my-inventory>
+	</template>
+
+	<script>
+	Polymer({
+		is: "dim-app",
+		properties: {
+			destinyMembershipId: String,
+			membershipType: String,
+			bungled: String,
+			bungleatk: String,
+			loginStatus: String,
+			cookie: {
+				type: String,
+				computed: 'cookieString(bungled, bungleatk)'
+			}
+		},
+		cookieString: function(bungled, bungleatk){
+			cStr = "bungled=" + bungled + ";" + "bungleatk=" + bungleatk;
+			return cStr;
+		},
+		ready: function(){
+			that = this;
+			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
+			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+			Q.all([promiseBungled, promistBungleatk])
+			.then(function(data){
+				that.bungled = data[0].value;
+				that.bungleatk = data[1].value;
+				return Q(qwest.get("https://www.bungie.net/en/profile"))
+			})
+			.then(function(xhr){
+				var id = /destinyMembershipId: "(.*)"/;
+				var type = /membershipType: "(.*)"/;
+				that.destinyMembershipId = xhr.response.match(id)[1];
+				that.membershipType = xhr.response.match(type)[1];
+				that.loginStatus = "LOGGED IN";
+			}, function(){
+				that.loginStatus = "NOT LOGGED IN";
+			})
+		},
+		cookieGet: function (url, name){
+			var deferred = Q.defer();
+			chrome.cookies.get({"url": url, "name": name}, function(cookie){
+				deferred.resolve(cookie);
+			});
+			return deferred.promise;
+		}
+	});
+	</script>
+</dom-module>
