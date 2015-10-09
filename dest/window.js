@@ -6371,6 +6371,18 @@ this.fire('dom-change');
 }
 });
 Polymer({
+		is: "my-inventory",
+		properties: {
+			inventory: String,
+			inventoryObj: {
+				type: Object,
+				computed: 'invToObj(inventory)'
+			}
+		},
+		invToObj: function(inventory){
+		}
+	});
+Polymer({
 		is: "dim-app",
 		properties: {
 			destinyMembershipId: String,
@@ -6378,9 +6390,14 @@ Polymer({
 			bungled: String,
 			bungleatk: String,
 			loginStatus: String,
+			inventoryJSON: String,
 			cookie: {
 				type: String,
 				computed: 'cookieString(bungled, bungleatk)'
+			},
+			apiKey: {
+				type: String,
+				value: "17046260b2014770afb509a3e96a1fe2"
 			}
 		},
 		cookieString: function(bungled, bungleatk){
@@ -6402,9 +6419,13 @@ Polymer({
 				var type = /membershipType: "(.*)"/;
 				that.destinyMembershipId = xhr.response.match(id)[1];
 				that.membershipType = xhr.response.match(type)[1];
-				that.loginStatus = "LOGGED IN";
+				var inventoryUrl = "http://www.bungie.net/Platform/Destiny/" + that.membershipType + "/Account/" + that.destinyMembershipId + "/Items/"
+				return Q(qwest.get(inventoryUrl, {}, {"headers": {"X-API-KEY": that.apiKey}}))
 			}, function(){
 				that.loginStatus = "NOT LOGGED IN";
+			})
+			.then(function(xhr){
+				that.inventoryJSON = xhr.response;
 			})
 		},
 		cookieGet: function (url, name){

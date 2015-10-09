@@ -1,9 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="my-inventory.html">
 
 <dom-module id="dim-app">
 	<template>
-		<my-inventory membership-type="{{membershipType}}"
-		              destiny-membership-id="{{destinyMembershipId}}">
+		<my-inventory inventory="{{inventoryJSON}}">
 		</my-inventory>
 	</template>
 
@@ -16,9 +16,14 @@
 			bungled: String,
 			bungleatk: String,
 			loginStatus: String,
+			inventoryJSON: String,
 			cookie: {
 				type: String,
 				computed: 'cookieString(bungled, bungleatk)'
+			},
+			apiKey: {
+				type: String,
+				value: "17046260b2014770afb509a3e96a1fe2"
 			}
 		},
 		cookieString: function(bungled, bungleatk){
@@ -40,9 +45,13 @@
 				var type = /membershipType: "(.*)"/;
 				that.destinyMembershipId = xhr.response.match(id)[1];
 				that.membershipType = xhr.response.match(type)[1];
-				that.loginStatus = "LOGGED IN";
+				var inventoryUrl = "http://www.bungie.net/Platform/Destiny/" + that.membershipType + "/Account/" + that.destinyMembershipId + "/Items/"
+				return Q(qwest.get(inventoryUrl, {}, {"headers": {"X-API-KEY": that.apiKey}}))
 			}, function(){
 				that.loginStatus = "NOT LOGGED IN";
+			})
+			.then(function(xhr){
+				that.inventoryJSON = xhr.response;
 			})
 		},
 		cookieGet: function (url, name){

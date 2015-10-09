@@ -1,0 +1,22 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="my-inventory">
+	<template>
+		<span>{{inventory}}</span>
+	</template>
+
+	<script>
+	Polymer({
+		is: "my-inventory",
+		properties: {
+			inventory: String,
+			inventoryObj: {
+				type: Object,
+				computed: 'invToObj(inventory)'
+			}
+		},
+		invToObj: function(inventory){
+		}
+	});
+	</script>
+</dom-module>
