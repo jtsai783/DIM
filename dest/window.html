@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8">
     <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="../bower_components/q/q.js"></script>
     <script src="../bower_components/promise-polyfill/Promise.js"></script>
 <!--
 iron-request can be used to perform XMLHttpRequests.
@@ -36,8 +37,15 @@ element.
 </head>
   <body><div hidden="" by-vulcanize=""><dom-module id="binding-test" assetpath="/">
 	<template>
-		<iron-ajax auto="" url="http://www.bungie.net/Platform/Destiny/Manifest" headers="{&quot;X-API-KEY&quot;: &quot;17046260b2014770afb509a3e96a1fe2&quot;}" handle-as="text" debounce-duration="300" last-response="{{res}}"></iron-ajax>
-    <span>{{res}}</span>
+	<!-- 	<iron-ajax
+    auto
+    url="http://www.bungie.net/Platform/Destiny/Manifest"
+    headers='{"X-API-KEY": "17046260b2014770afb509a3e96a1fe2"}'
+    handle-as="text"
+    debounce-duration="300"
+    last-response="{{res}}"></iron-ajax> -->
+    <iron-ajax id="sendRequest" url="http://www.bungie.net/en/profile" handle-as="text" debounce-duration="300" last-response="{{res}}"></iron-ajax>
+    <span>{{bungleatk}}</span>
 	</template>
 
 	<dom-module></dom-module></dom-module></div>

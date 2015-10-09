@@ -7184,6 +7184,18 @@ if (!window.Promise) {
 Polymer({
 		is: "binding-test",
 		properties: {
-			res: String
+			res: String,
+			bungled: String,
+			bungleatk: String
+		},
+		ready: function(){
+			that = this;
+
+			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
+			// 	that.bungled = cookie.value;
+			// });
+			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
+			// 	that.bungleatk = cookie.value;
+			// });
 		}
 	});

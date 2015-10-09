@@ -3,21 +3,39 @@
 
 <dom-module id="binding-test">
 	<template>
-		<iron-ajax
+	<!-- 	<iron-ajax
     auto
     url="http://www.bungie.net/Platform/Destiny/Manifest"
     headers='{"X-API-KEY": "17046260b2014770afb509a3e96a1fe2"}'
     handle-as="text"
     debounce-duration="300"
+    last-response="{{res}}"></iron-ajax> -->
+    <iron-ajax
+    id="sendRequest"
+    url="http://www.bungie.net/en/profile"
+    handle-as="text"
+    debounce-duration="300"
     last-response="{{res}}"></iron-ajax>
-    <span>{{res}}</span>
+    <span>{{bungleatk}}</span>
 	</template>
 
 	<script>
 	Polymer({
 		is: "binding-test",
 		properties: {
-			res: String
+			res: String,
+			bungled: String,
+			bungleatk: String
+		},
+		ready: function(){
+			that = this;
+
+			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
+			// 	that.bungled = cookie.value;
+			// });
+			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
+			// 	that.bungleatk = cookie.value;
+			// });
 		}
 	});
 	</script>
