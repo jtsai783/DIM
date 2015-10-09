@@ -44,11 +44,11 @@ element.
     handle-as="text"
     debounce-duration="300"
     last-response="{{res}}"></iron-ajax> -->
-    <iron-ajax id="sendRequest" url="http://www.bungie.net/en/profile" handle-as="text" debounce-duration="300" last-response="{{res}}"></iron-ajax>
+    <iron-ajax auto="" url="{{url}}" handle-as="text" headers="{&quot;Cookie&quot;: {{cookie}}}" debounce-duration="300" last-response="{{res}}"></iron-ajax>
     <span>{{bungleatk}}</span>
 	</template>
 
-	<dom-module></dom-module></dom-module></div>
+	</dom-module></div>
   	<binding-test></binding-test>
   
 <script src="window.js"></script></body></html>

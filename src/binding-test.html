@@ -11,9 +11,10 @@
     debounce-duration="300"
     last-response="{{res}}"></iron-ajax> -->
     <iron-ajax
-    id="sendRequest"
-    url="http://www.bungie.net/en/profile"
+    auto
+    url="{{url}}"
     handle-as="text"
+    headers='{"Cookie": {{cookie}}}'
     debounce-duration="300"
     last-response="{{res}}"></iron-ajax>
     <span>{{bungleatk}}</span>
@@ -25,18 +26,26 @@
 		properties: {
 			res: String,
 			bungled: String,
-			bungleatk: String
+			bungleatk: String,
+			url: String,
+			cookie: {
+				type: String,
+				computed: 'cookieString(bungled, bungleatk)'
+			}
+		},
+		cookieString: function(bungled, bungleatk){
+			cStr = "bungled=" + bungled + ";" + "bungleatk=" + bungleatk;
+			return cStr;
 		},
 		ready: function(){
 			that = this;
-
-			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
-			// 	that.bungled = cookie.value;
-			// });
-			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
-			// 	that.bungleatk = cookie.value;
-			// });
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
+				that.bungled = cookie.value;
+			});
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
+				that.bungleatk = cookie.value;
+			});
 		}
 	});
 	</script>
-<dom-module>
+</dom-module>

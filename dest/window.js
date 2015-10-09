@@ -7186,16 +7186,24 @@ Polymer({
 		properties: {
 			res: String,
 			bungled: String,
-			bungleatk: String
+			bungleatk: String,
+			url: String,
+			cookie: {
+				type: String,
+				computed: 'cookieString(bungled, bungleatk)'
+			}
+		},
+		cookieString: function(bungled, bungleatk){
+			cStr = "bungled=" + bungled + ";" + "bungleatk=" + bungleatk;
+			return cStr;
 		},
 		ready: function(){
 			that = this;
-
-			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
-			// 	that.bungled = cookie.value;
-			// });
-			// chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
-			// 	that.bungleatk = cookie.value;
-			// });
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function (cookie){
+				that.bungled = cookie.value;
+			});
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungleatk"}, function (cookie){
+				that.bungleatk = cookie.value;
+			});
 		}
 	});
