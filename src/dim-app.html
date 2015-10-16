@@ -1,58 +1,69 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="my-inventory.html">
+<link rel="import" href="item-filter.html">
 
 <dom-module id="dim-app">
 	<template>
-		<my-inventory inventory="{{inventoryJSON}}">
+		<item-filter selection="{{weaponTypeSelection}}"></item-filter>
+		<br>
+		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}" filter="{{weaponTypeSelection}}">
 		</my-inventory>
+		
 	</template>
 
 	<script>
 	Polymer({
 		is: "dim-app",
 		properties: {
+			characters: Object,
+			weaponTypeSelection: String,
+			destinyMembershipType: String,
 			destinyMembershipId: String,
 			membershipType: String,
-			bungled: String,
-			bungleatk: String,
 			loginStatus: String,
-			inventoryJSON: String,
-			cookie: {
-				type: String,
-				computed: 'cookieString(bungled, bungleatk)'
-			},
+			charInv: Object,
+			vaultInv: Object,
 			apiKey: {
 				type: String,
 				value: "17046260b2014770afb509a3e96a1fe2"
 			}
 		},
-		cookieString: function(bungled, bungleatk){
-			cStr = "bungled=" + bungled + ";" + "bungleatk=" + bungleatk;
-			return cStr;
-		},
 		ready: function(){
 			that = this;
 			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
 			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+
 			Q.all([promiseBungled, promistBungleatk])
 			.then(function(data){
-				that.bungled = data[0].value;
-				that.bungleatk = data[1].value;
-				return Q(qwest.get("https://www.bungie.net/en/profile"))
+				return Q(qwest.get("https://www.bungie.net/en/profile"));
 			})
 			.then(function(xhr){
 				var id = /destinyMembershipId: "(.*)"/;
 				var type = /membershipType: "(.*)"/;
+				var dType = /destinyMembershipType: "(.*)"/;
 				that.destinyMembershipId = xhr.response.match(id)[1];
 				that.membershipType = xhr.response.match(type)[1];
-				var inventoryUrl = "http://www.bungie.net/Platform/Destiny/" + that.membershipType + "/Account/" + that.destinyMembershipId + "/Items/"
-				return Q(qwest.get(inventoryUrl, {}, {"headers": {"X-API-KEY": that.apiKey}}))
+				that.destinyMembershipType = xhr.response.match(dType)[1];
+				var vaultInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/";
+				return Q(qwest.get(vaultInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
 			}, function(){
 				that.loginStatus = "NOT LOGGED IN";
 			})
 			.then(function(xhr){
-				that.inventoryJSON = xhr.response;
+				that.vaultInv = JSON.parse(xhr.response);
+				that.characters = that.vaultInv.Response.data.characters;
+				console.log("vault ready");
+				var charGetArr = that.buildCharPromises(that.characters);
+				return Q.all(charGetArr);
+			}, function() {
+				// debugger
 			})
+			.then(function(data){
+				that.charInv = _.map(data, function(charXhr){
+					return JSON.parse(charXhr.response).Response.data;
+				});
+				console.log("char ready");
+			});
 		},
 		cookieGet: function (url, name){
 			var deferred = Q.defer();
@@ -60,6 +71,12 @@
 				deferred.resolve(cookie);
 			});
 			return deferred.promise;
+		},
+		buildCharPromises: function (characters) {
+			return _.map(characters, function(character) {
+				var charInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/Character/" + character.characterBase.characterId + "/Inventory/?definitions=false";
+				return Q(qwest.get(charInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
+			});
 		}
 	});
 	</script>

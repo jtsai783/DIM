@@ -11,6 +11,7 @@
   "permissions" : [
     "storage",
     "*://*.bungie.net/*",
-    "cookies"
+    "cookies",
+    "downloads"
   ]
 }

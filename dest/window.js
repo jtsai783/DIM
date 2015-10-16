@@ -6373,60 +6373,101 @@ this.fire('dom-change');
 Polymer({
 		is: "my-inventory",
 		properties: {
-			inventory: String,
-			inventoryObj: {
-				type: Object,
-				computed: 'invToObj(inventory)'
-			}
+			vaultInv: Object,
+			charInv: Object,
+			displayItems: Array
 		},
-		invToObj: function(inventory){
+		lookUpName: function(hash){
+			return DIM.items[hash].itemName;
+		},
+		lookUpTypeName: function(hash){
+			return DIM.items[hash].itemTypeName;
 		}
+		// changeFilter: function(){
+		// 	that = this;
+		// 	this.displayItems = [];
+		// 	var filter = DIM.categoryMapping[this.filter];
+		// 	_.each(that.vaultInv.Response.data.inventory.buckets.Item, function(bucket) {
+		// 		_.each(bucket.items, function(item) {
+		// 			if(that.lookUpTypeName(item.itemHash) === filter){
+		// 				that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemInstanceId});
+		// 			}
+		// 		});
+		// 	});
+		// 	_.each(that.charInv.Response.data.items, function(item) {
+		// 		if(that.lookUpTypeName(item.itemHash) === filter){
+		// 			that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemId});
+		// 		}
+		// 	});
+		// }
 	});
+Polymer({
+			is: "item-filter",
+			properties: {
+				selection: {
+					type: String,
+					notify: true
+				}
+			},
+			listeners: {
+				'tap': 'applyFilter'
+			},
+			applyFilter: function (e){
+				this.selection = e.target.id;
+			}
+		});
 Polymer({
 		is: "dim-app",
 		properties: {
+			characters: Object,
+			weaponTypeSelection: String,
+			destinyMembershipType: String,
 			destinyMembershipId: String,
 			membershipType: String,
-			bungled: String,
-			bungleatk: String,
 			loginStatus: String,
-			inventoryJSON: String,
-			cookie: {
-				type: String,
-				computed: 'cookieString(bungled, bungleatk)'
-			},
+			charInv: Object,
+			vaultInv: Object,
 			apiKey: {
 				type: String,
 				value: "17046260b2014770afb509a3e96a1fe2"
 			}
 		},
-		cookieString: function(bungled, bungleatk){
-			cStr = "bungled=" + bungled + ";" + "bungleatk=" + bungleatk;
-			return cStr;
-		},
 		ready: function(){
 			that = this;
 			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
 			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+
 			Q.all([promiseBungled, promistBungleatk])
 			.then(function(data){
-				that.bungled = data[0].value;
-				that.bungleatk = data[1].value;
-				return Q(qwest.get("https://www.bungie.net/en/profile"))
+				return Q(qwest.get("https://www.bungie.net/en/profile"));
 			})
 			.then(function(xhr){
 				var id = /destinyMembershipId: "(.*)"/;
 				var type = /membershipType: "(.*)"/;
+				var dType = /destinyMembershipType: "(.*)"/;
 				that.destinyMembershipId = xhr.response.match(id)[1];
 				that.membershipType = xhr.response.match(type)[1];
-				var inventoryUrl = "http://www.bungie.net/Platform/Destiny/" + that.membershipType + "/Account/" + that.destinyMembershipId + "/Items/"
-				return Q(qwest.get(inventoryUrl, {}, {"headers": {"X-API-KEY": that.apiKey}}))
+				that.destinyMembershipType = xhr.response.match(dType)[1];
+				var vaultInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/";
+				return Q(qwest.get(vaultInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
 			}, function(){
 				that.loginStatus = "NOT LOGGED IN";
 			})
 			.then(function(xhr){
-				that.inventoryJSON = xhr.response;
+				that.vaultInv = JSON.parse(xhr.response);
+				that.characters = that.vaultInv.Response.data.characters;
+				console.log("vault ready");
+				var charGetArr = that.buildCharPromises(that.characters);
+				return Q.all(charGetArr);
+			}, function() {
+				// debugger
 			})
+			.then(function(data){
+				that.charInv = _.map(data, function(charXhr){
+					return JSON.parse(charXhr.response).Response.data;
+				});
+				console.log("char ready");
+			});
 		},
 		cookieGet: function (url, name){
 			var deferred = Q.defer();
@@ -6434,5 +6475,11 @@ Polymer({
 				deferred.resolve(cookie);
 			});
 			return deferred.promise;
+		},
+		buildCharPromises: function (characters) {
+			return _.map(characters, function(character) {
+				var charInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/Character/" + character.characterBase.characterId + "/Inventory/?definitions=false";
+				return Q(qwest.get(charInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
+			});
 		}
 	});

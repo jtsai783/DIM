@@ -1,0 +1,27 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="item-filter">
+
+	<template>
+		<a id="scout-rifle">Scout Rifle</a> | <a id="sniper-rifle">Sniper Rifle</a>
+	</template>
+
+	<script>
+		Polymer({
+			is: "item-filter",
+			properties: {
+				selection: {
+					type: String,
+					notify: true
+				}
+			},
+			listeners: {
+				'tap': 'applyFilter'
+			},
+			applyFilter: function (e){
+				this.selection = e.target.id;
+			}
+		});
+	</script>
+
+</dom-module>

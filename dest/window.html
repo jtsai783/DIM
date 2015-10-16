@@ -2,16 +2,30 @@
     <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
     <script src="../bower_components/q/q.js"></script>
     <script src="../bower_components/qwest/qwest.min.js"></script>
+    <script src="../bower_components/underscore/underscore-min.js"></script>
+    <script src="../scripts/globals.js"></script>
     </head>
   <body><div hidden="" by-vulcanize=""><dom-module id="my-inventory" assetpath="/">
 	<template>
-		<span>{{inventory}}</span>
+		<template is="dom-repeat" items="{{displayItems}}">
+        <span>{{item.name}}</span> <span>{{item.instanceId}}</span>
+        <br>
+    </template>
+	</template>
+
+	</dom-module><dom-module id="item-filter" assetpath="/">
+
+	<template>
+		<a id="scout-rifle">Scout Rifle</a> | <a id="sniper-rifle">Sniper Rifle</a>
 	</template>
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
-		<my-inventory inventory="{{inventoryJSON}}">
+		<item-filter selection="{{weaponTypeSelection}}"></item-filter>
+		<br>
+		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}" filter="{{weaponTypeSelection}}">
 		</my-inventory>
+		
 	</template>
 
 	</dom-module></div>

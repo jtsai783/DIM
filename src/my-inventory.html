@@ -2,21 +2,44 @@
 
 <dom-module id="my-inventory">
 	<template>
-		<span>{{inventory}}</span>
+		<template is="dom-repeat" 
+		          items="{{displayItems}}">
+        <span>{{item.name}}</span> <span>{{item.instanceId}}</span>
+        <br>
+    </template>
 	</template>
 
 	<script>
 	Polymer({
 		is: "my-inventory",
 		properties: {
-			inventory: String,
-			inventoryObj: {
-				type: Object,
-				computed: 'invToObj(inventory)'
-			}
+			vaultInv: Object,
+			charInv: Object,
+			displayItems: Array
 		},
-		invToObj: function(inventory){
+		lookUpName: function(hash){
+			return DIM.items[hash].itemName;
+		},
+		lookUpTypeName: function(hash){
+			return DIM.items[hash].itemTypeName;
 		}
+		// changeFilter: function(){
+		// 	that = this;
+		// 	this.displayItems = [];
+		// 	var filter = DIM.categoryMapping[this.filter];
+		// 	_.each(that.vaultInv.Response.data.inventory.buckets.Item, function(bucket) {
+		// 		_.each(bucket.items, function(item) {
+		// 			if(that.lookUpTypeName(item.itemHash) === filter){
+		// 				that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemInstanceId});
+		// 			}
+		// 		});
+		// 	});
+		// 	_.each(that.charInv.Response.data.items, function(item) {
+		// 		if(that.lookUpTypeName(item.itemHash) === filter){
+		// 			that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemId});
+		// 		}
+		// 	});
+		// }
 	});
 	</script>
 </dom-module>
