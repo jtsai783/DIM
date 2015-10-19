@@ -4,11 +4,8 @@
 
 <dom-module id="dim-app">
 	<template>
-		<item-filter selection="{{weaponTypeSelection}}"></item-filter>
-		<br>
-		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}" filter="{{weaponTypeSelection}}">
+		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}">
 		</my-inventory>
-		
 	</template>
 
 	<script>
@@ -29,7 +26,7 @@
 			}
 		},
 		ready: function(){
-			that = this;
+			var that = this;
 			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
 			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
 
@@ -50,8 +47,8 @@
 				that.loginStatus = "NOT LOGGED IN";
 			})
 			.then(function(xhr){
-				that.vaultInv = JSON.parse(xhr.response);
-				that.characters = that.vaultInv.Response.data.characters;
+				that.vaultInv = JSON.parse(xhr.response).Response.data;
+				that.characters = that.vaultInv.characters;
 				console.log("vault ready");
 				var charGetArr = that.buildCharPromises(that.characters);
 				return Q.all(charGetArr);
@@ -60,10 +57,15 @@
 			})
 			.then(function(data){
 				that.charInv = _.map(data, function(charXhr){
-					return JSON.parse(charXhr.response).Response.data;
+					var res = JSON.parse(charXhr.response);
+					var charInv = res.Response.data;
+					charInv.characterId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
+					return charInv;
 				});
 				console.log("char ready");
-			});
+				that.buildInventory();
+			})
+			.then(function(){debugger},function(err){debugger});
 		},
 		cookieGet: function (url, name){
 			var deferred = Q.defer();
@@ -73,10 +75,139 @@
 			return deferred.promise;
 		},
 		buildCharPromises: function (characters) {
+			var that = this;
 			return _.map(characters, function(character) {
 				var charInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/Character/" + character.characterBase.characterId + "/Inventory/?definitions=false";
 				return Q(qwest.get(charInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
 			});
+		},
+		buildInventory: function() {
+			this.buildFromVault();
+			this.buildFromChars();
+			this.filterInventory();
+		},
+		filterInventory: function() {
+			DIM.inventory = _.omit(DIM.inventory, function(val, key, obj){
+				return _.some(DIM.inventoryFilter, function(keyword){
+					return key.includes(keyword);
+				});
+			});
+		},
+		lookUpTypeName: function(hash){
+			return DIM.items[hash].itemTypeName;
+		},
+		buildFromChars: function(){
+			var that = this;
+			_.each(this.charInv, function(inv){
+				that.buildFromBuckets(inv, inv.characterId);
+			});
+		},
+		buildFromVault: function(){
+			var that = this;
+			this.buildFromBuckets(this.vaultInv.inventory, "Vault");
+		},
+		buildFromBuckets: function(inv, location){
+			var that = this;
+			var buckets = null;
+			if (location === "Vault"){
+				buckets = inv.buckets.Item;
+			} else {
+				buckets = inv.buckets.Equippable;
+			}
+			_.each(buckets, function(bucket) {
+				DIM.bucketName = DIM.buckets[bucket.bucketHash].bucketName;
+				_.each(bucket.items, function(item) {
+					var categoryName = that.lookUpTypeName(item.itemHash);
+					var itemClass = DIM.items[item.itemHash].classType;
+					var combinedName = "" + categoryName + " " + itemClass;
+					if (categoryName.includes("Order")){
+						combinedName = combinedName + " " + DIM.bucketName;
+					}
+					if (_.has(DIM.inventory, combinedName)){
+						DIM.inventory[combinedName].push(that.normalizeItem(item, location));
+					} else {
+						DIM.inventory[combinedName] = [];
+						DIM.inventory[combinedName].push(that.normalizeItem(item, location));
+					}
+				});
+			});
+		},
+		normalizeItem: function(vaultItem, location) {
+			var archetype = DIM.items[vaultItem.itemHash];
+			var normalizedItem = {};
+			var classType = archetype.classType;
+			var className = "";
+			var artifactClass = archetype.itemTypeName.match(/(.*) Artifact/);
+			if (artifactClass === null) {
+				if (classType === 0){
+					className = "Titan";
+				} else if (classType === 1) {
+					className = "Hunter";
+				} else if (classType === 2) {
+					className = "Warlock";
+				} else if (classType === 3) {
+					className = "All";
+				}
+			} else {
+				className = artifactClass[1];
+			}
+			normalizedItem.klass = className;
+			normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			normalizedItem.stats = this.getStat(vaultItem);
+			var baseStat = this.getStat(archetype);
+			var hStat = _.omit(baseStat, _.keys(normalizedItem.stats));
+			baseStat = _.pick(baseStat, _.keys(normalizedItem.stats));
+			normalizedItem.baseStat = baseStat;
+			hStat = _.omit(hStat, DIM.ignoredStats);
+			if (typeof vaultItem.primaryStat !== "undefined"){
+				var pStat = DIM.stats[vaultItem.primaryStat.statHash].statName;
+				var pVal = vaultItem.primaryStat.value;
+				normalizedItem.primaryStat = {};
+				normalizedItem.primaryStat[pStat] = pVal;
+				hStat = _.omit(hStat, _.keys(normalizedItem.primaryStat));
+			}
+			normalizedItem.hiddenStats = hStat;
+			normalizedItem.name = DIM.items[vaultItem.itemHash].itemName;
+			normalizedItem.location = location;
+			normalizedItem.talentGrid = this.getTalent(vaultItem);
+			normalizedItem.isEquipped = vaultItem.isEquipped;
+			normalizedItem.damageType = DIM.damageType[vaultItem.damageType];
+			return normalizedItem;
+		},
+		getStat: function(archetype) {
+			var friendlyStats = {};
+			_.each(archetype.stats, function(stat){
+				var name = DIM.stats[stat.statHash].statName;
+				var val = stat.value;
+				friendlyStats[name] = val;
+			});
+			return friendlyStats;
+		},
+		getTalent: function(item){
+			var returnGrid = [];
+			if (typeof DIM.talents[item.talentGridHash] !== "undefined"){
+				var baseGridNodes = DIM.talents[item.talentGridHash].nodes;
+				var itemNodes = item.nodes;
+				_.each(baseGridNodes, function(node){
+					if (node.row >= 0 && node.column >= 0){
+						var currentItemNode = _.find(itemNodes, function(itemNode){
+							return itemNode.nodeHash === node.nodeHash;
+						});
+						var step = node.steps[currentItemNode.stepIndex];
+						var nodeObj = {};
+						nodeObj.name = step.nodeStepName;
+						nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+						nodeObj.description = step.nodeStepDescription;
+						if (typeof returnGrid[node.row] !== "undefined"){
+							returnGrid[node.row][node.column] = nodeObj;
+						} else {
+							returnGrid[node.row] = [];
+							returnGrid[node.row][node.column] = nodeObj;
+						}
+					}
+				});
+			}
+			return returnGrid;
 		}
 	});
 	</script>
