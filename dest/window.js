@@ -6404,21 +6404,13 @@ Polymer({
 Polymer({
 			is: "item-filter",
 			properties: {
-				selection: {
-					type: String,
-					notify: true
-				}
-			},
-			listeners: {
-				'tap': 'applyFilter'
-			},
-			applyFilter: function (e){
-				this.selection = e.target.id;
+				categories: Object
 			}
 		});
 Polymer({
 		is: "dim-app",
 		properties: {
+			normalizedInventory: Object,
 			characters: Object,
 			weaponTypeSelection: String,
 			destinyMembershipType: String,
@@ -6472,7 +6464,9 @@ Polymer({
 				console.log("char ready");
 				that.buildInventory();
 			})
-			.then(function(){debugger},function(err){debugger});
+			.then(function(){
+				that.normalizedInventory = DIM.inventory;
+			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
 			var deferred = Q.defer();
@@ -6527,15 +6521,39 @@ Polymer({
 					var categoryName = that.lookUpTypeName(item.itemHash);
 					var itemClass = DIM.items[item.itemHash].classType;
 					var combinedName = "" + categoryName + " " + itemClass;
-					if (categoryName.includes("Order")){
-						combinedName = combinedName + " " + DIM.bucketName;
+					if (categoryName.includes("Artifact")){
+						var splitName = categoryName.split(" ");
+						itemClass = splitName[0];
+						categoryName = splitName[1];
 					}
-					if (_.has(DIM.inventory, combinedName)){
-						DIM.inventory[combinedName].push(that.normalizeItem(item, location));
-					} else {
-						DIM.inventory[combinedName] = [];
-						DIM.inventory[combinedName].push(that.normalizeItem(item, location));
+					if (categoryName.includes("Bond") || categoryName.includes("Cloak") || categoryName.includes("Mark")){
+						categoryName = "Class Armor";
 					}
+					if (typeof DIM.inventory[categoryName] === "undefined"){
+						DIM.inventory[categoryName] = {};
+					}
+					if (categoryName !== "Artifact"){
+						switch(itemClass){
+							case 0:
+								itemClass = "Titan";
+								break;
+							case 1:
+								itemClass = "Hunter";
+								break;
+							case 2:
+								itemClass = "Warlock";
+								break;
+							case 3:
+								itemClass = "All";
+						}
+					}
+					if (categoryName === "Armsday Order"){
+						itemClass = DIM.bucketName;
+					}
+					if (typeof DIM.inventory[categoryName][itemClass] === "undefined"){
+						DIM.inventory[categoryName][itemClass] = [];
+					}
+					DIM.inventory[categoryName][itemClass].push(that.normalizeItem(item, location));
 				});
 			});
 		},

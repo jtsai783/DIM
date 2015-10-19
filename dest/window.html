@@ -16,11 +16,14 @@
 	</dom-module><dom-module id="item-filter" assetpath="/">
 
 	<template>
-		<a id="scout-rifle">Scout Rifle</a> | <a id="sniper-rifle">Sniper Rifle</a>
+		<template is="dom-repeat" items="{{categories}}">
+			<span>{{item}}</span>
+    </template>
 	</template>
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
+		<item-filter categories="{{normalizedInventory}}"></item-filter>
 		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}">
 		</my-inventory>
 	</template>
