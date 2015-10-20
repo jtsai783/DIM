@@ -6371,35 +6371,31 @@ this.fire('dom-change');
 }
 });
 Polymer({
+		is: "item-card",
+		properties: {
+			item: Object
+		},
+		itemIcon: function(iconFilename){
+			return "../icons/" + iconFilename;
+		}
+	});
+Polymer({
 		is: "my-inventory",
 		properties: {
-			vaultInv: Object,
-			charInv: Object,
+			filter: {
+				type: String,
+				observer: "onFilterChange"
+			},
 			displayItems: Array
 		},
-		lookUpName: function(hash){
-			return DIM.items[hash].itemName;
-		},
-		lookUpTypeName: function(hash){
-			return DIM.items[hash].itemTypeName;
+		onFilterChange: function(newVal, oldVal){
+			var mapping = DIM.filterMapping[newVal];
+			var items = DIM.inventory;
+			_.each(mapping, function(el, index){
+				items = items[el];
+			});
+			this.displayItems = items;
 		}
-		// changeFilter: function(){
-		// 	that = this;
-		// 	this.displayItems = [];
-		// 	var filter = DIM.categoryMapping[this.filter];
-		// 	_.each(that.vaultInv.Response.data.inventory.buckets.Item, function(bucket) {
-		// 		_.each(bucket.items, function(item) {
-		// 			if(that.lookUpTypeName(item.itemHash) === filter){
-		// 				that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemInstanceId});
-		// 			}
-		// 		});
-		// 	});
-		// 	_.each(that.charInv.Response.data.items, function(item) {
-		// 		if(that.lookUpTypeName(item.itemHash) === filter){
-		// 			that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemId});
-		// 		}
-		// 	});
-		// }
 	});
 Polymer({
 			is: "item-filter",
@@ -6410,6 +6406,7 @@ Polymer({
 Polymer({
 		is: "dim-app",
 		properties: {
+			filter: String,
 			normalizedInventory: Object,
 			characters: Object,
 			weaponTypeSelection: String,
@@ -6465,7 +6462,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.normalizedInventory = DIM.inventory;
+				that.filter = "scout-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
@@ -6610,28 +6607,28 @@ Polymer({
 		},
 		getTalent: function(item){
 			var returnGrid = [];
-			if (typeof DIM.talents[item.talentGridHash] !== "undefined"){
-				var baseGridNodes = DIM.talents[item.talentGridHash].nodes;
-				var itemNodes = item.nodes;
-				_.each(baseGridNodes, function(node){
-					if (node.row >= 0 && node.column >= 0){
-						var currentItemNode = _.find(itemNodes, function(itemNode){
-							return itemNode.nodeHash === node.nodeHash;
-						});
-						var step = node.steps[currentItemNode.stepIndex];
-						var nodeObj = {};
-						nodeObj.name = step.nodeStepName;
-						nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-						nodeObj.description = step.nodeStepDescription;
-						if (typeof returnGrid[node.row] !== "undefined"){
-							returnGrid[node.row][node.column] = nodeObj;
-						} else {
-							returnGrid[node.row] = [];
-							returnGrid[node.row][node.column] = nodeObj;
-						}
-					}
-				});
-			}
+			// if (typeof DIM.talents[item.talentGridHash] !== "undefined"){
+			// 	var baseGridNodes = DIM.talents[item.talentGridHash].nodes;
+			// 	var itemNodes = item.nodes;
+			// 	_.each(baseGridNodes, function(node){
+			// 		if (node.row >= 0 && node.column >= 0){
+			// 			var currentItemNode = _.find(itemNodes, function(itemNode){
+			// 				return itemNode.nodeHash === node.nodeHash;
+			// 			});
+			// 			var step = node.steps[currentItemNode.stepIndex];
+			// 			var nodeObj = {};
+			// 			nodeObj.name = step.nodeStepName;
+			// 			nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			// 			nodeObj.description = step.nodeStepDescription;
+			// 			if (typeof returnGrid[node.row] !== "undefined"){
+			// 				returnGrid[node.row][node.column] = nodeObj;
+			// 			} else {
+			// 				returnGrid[node.row] = [];
+			// 				returnGrid[node.row][node.column] = nodeObj;
+			// 			}
+			// 		}
+			// 	});
+			// }
 			return returnGrid;
 		}
 	});

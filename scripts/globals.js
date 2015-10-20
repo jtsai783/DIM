@@ -38,7 +38,5 @@ DIM.inventoryFilter = ["Shader", "Engram", "Subclass", "Vehicle",
 										 	"Ship", "Material", "Consum", "Emblem", "Emote", "Default"
 											];
 
-
-DIM.categoryMapping = {};
-DIM.categoryMapping["scout-rifle"] = "Scout Rifle";
-DIM.categoryMapping["sniper-rifle"] = "Sniper Rifle";
+DIM.filterMapping = {};
+DIM.filterMapping["scout-rifle"] = ["Scout Rifle", "All"];

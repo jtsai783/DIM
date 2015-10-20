@@ -1,11 +1,11 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="item-card.html">
 
 <dom-module id="my-inventory">
+
 	<template>
-		<template is="dom-repeat" 
-		          items="{{displayItems}}">
-        <span>{{item.name}}</span> <span>{{item.instanceId}}</span>
-        <br>
+		<template is="dom-repeat" items="{{displayItems}}">
+			<item-card item="{{item}}"></item-card>
     </template>
 	</template>
 
@@ -13,33 +13,20 @@
 	Polymer({
 		is: "my-inventory",
 		properties: {
-			vaultInv: Object,
-			charInv: Object,
+			filter: {
+				type: String,
+				observer: "onFilterChange"
+			},
 			displayItems: Array
 		},
-		lookUpName: function(hash){
-			return DIM.items[hash].itemName;
-		},
-		lookUpTypeName: function(hash){
-			return DIM.items[hash].itemTypeName;
+		onFilterChange: function(newVal, oldVal){
+			var mapping = DIM.filterMapping[newVal];
+			var items = DIM.inventory;
+			_.each(mapping, function(el, index){
+				items = items[el];
+			});
+			this.displayItems = items;
 		}
-		// changeFilter: function(){
-		// 	that = this;
-		// 	this.displayItems = [];
-		// 	var filter = DIM.categoryMapping[this.filter];
-		// 	_.each(that.vaultInv.Response.data.inventory.buckets.Item, function(bucket) {
-		// 		_.each(bucket.items, function(item) {
-		// 			if(that.lookUpTypeName(item.itemHash) === filter){
-		// 				that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemInstanceId});
-		// 			}
-		// 		});
-		// 	});
-		// 	_.each(that.charInv.Response.data.items, function(item) {
-		// 		if(that.lookUpTypeName(item.itemHash) === filter){
-		// 			that.push("displayItems", {"name": that.lookUpName(item.itemHash), "instanceId": item.itemId});
-		// 		}
-		// 	});
-		// }
 	});
 	</script>
 </dom-module>

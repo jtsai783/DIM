@@ -1,0 +1,32 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="item-card">
+	
+
+
+	<template>
+		<style>
+			div.outer{
+				height: 100px;
+			}
+		</style>
+
+		<div class="outer">
+			<div>
+				<img src="{{itemIcon(item.icon)}}">
+			</div>
+		</div>
+	</template>
+
+	<script>
+	Polymer({
+		is: "item-card",
+		properties: {
+			item: Object
+		},
+		itemIcon: function(iconFilename){
+			return "../icons/" + iconFilename;
+		}
+	});
+	</script>
+</dom-module>

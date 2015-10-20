@@ -3,32 +3,125 @@
     <script src="../bower_components/q/q.js"></script>
     <script src="../bower_components/qwest/qwest.min.js"></script>
     <script src="../bower_components/underscore/underscore-min.js"></script>
+    <script src="../bower_components/Chart.js/Chart.min.js"></script>
+    <style is="custom-style" include="reset-styles"></style>
+    <style is="custom-style" include="doc-styles"></style>
     <script src="../scripts/globals.js"></script>
     </head>
-  <body><div hidden="" by-vulcanize=""><dom-module id="my-inventory" assetpath="/">
+  <body><div hidden="" by-vulcanize=""><dom-module id="reset-styles" assetpath="/">
+<template>
+	<style>
+      /* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+   */
+
+   html, body, div, span, applet, object, iframe,
+   h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+   a, abbr, acronym, address, big, cite, code,
+   del, dfn, em, img, ins, kbd, q, s, samp,
+   small, strike, strong, sub, sup, tt, var,
+   b, u, i, center,
+   dl, dt, dd, ol, ul, li,
+   fieldset, form, label, legend,
+   table, caption, tbody, tfoot, thead, tr, th, td,
+   article, aside, canvas, details, embed, 
+   figure, figcaption, footer, header, hgroup, 
+   menu, nav, output, ruby, section, summary,
+   time, mark, audio, video {
+   	margin: 0;
+   	padding: 0;
+   	border: 0;
+   	font-size: 100%;
+   	font: inherit;
+   	vertical-align: baseline;
+   }
+   /* HTML5 display-role reset for older browsers */
+   article, aside, details, figcaption, figure, 
+   footer, header, hgroup, menu, nav, section {
+   	display: block;
+   }
+   body {
+   	line-height: 1;
+   }
+   ol, ul {
+   	list-style: none;
+   }
+   blockquote, q {
+   	quotes: none;
+   }
+   blockquote:before, blockquote:after,
+   q:before, q:after {
+   	content: '';
+   	content: none;
+   }
+   table {
+   	border-collapse: collapse;
+   	border-spacing: 0;
+   }
+ </style> 
+</template>
+</dom-module><dom-module id="doc-styles" assetpath="/">
+<template>
+	<style>
+   #background {
+      width: 100%;
+      height: 100%;
+      background: 
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 0%,rgba(0,0,0,0.58) 100%),
+      linear-gradient(45deg, rgba(176,181,161,1) 0%,rgba(176,181,161,1) 32%,rgba(94,140,147,1) 67%,rgba(94,140,147,1) 100%);
+      position: fixed;
+   }
+   </style>
+</template>
+</dom-module><dom-module id="item-card" assetpath="/">
+	
+
+
+	<template>
+		<style>
+			div.outer{
+				height: 100px;
+			}
+		</style>
+
+		<div class="outer">
+			<div>
+				<img src="{{itemIcon(item.icon)}}">
+			</div>
+		</div>
+	</template>
+
+	</dom-module><dom-module id="my-inventory" assetpath="/">
+
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}">
-        <span>{{item.name}}</span> <span>{{item.instanceId}}</span>
-        <br>
+			<item-card item="{{item}}"></item-card>
     </template>
 	</template>
 
 	</dom-module><dom-module id="item-filter" assetpath="/">
 
 	<template>
-		<template is="dom-repeat" items="{{categories}}">
-			<span>{{item}}</span>
-    </template>
+		<style>
+			div {
+				background: black;
+				width: 100%;
+				height: 50px;
+			}
+		</style>
+		<div>test</div>
 	</template>
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
-		<item-filter categories="{{normalizedInventory}}"></item-filter>
-		<my-inventory vault-inv="{{vaultInv}}" char-inv="{{charInv}}">
+		<my-inventory filter="{{filter}}">
 		</my-inventory>
 	</template>
 
 	</dom-module></div>
-  	<dim-app></dim-app>
+    <div id="background">
+  	 <dim-app></dim-app>
+    </div>
   
 <script src="window.js"></script></body></html>

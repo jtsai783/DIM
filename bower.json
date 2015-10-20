@@ -17,6 +17,7 @@
     "iron-ajax": "PolymerElements/iron-ajax#~1.0.6",
     "q": "1.0.1",
     "qwest": "~2.1.0",
-    "underscore": "~1.8.3"
+    "underscore": "~1.8.3",
+    "Chart.js": "~1.0.2"
   }
 }
