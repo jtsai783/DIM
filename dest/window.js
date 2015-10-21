@@ -6400,9 +6400,9 @@ Polymer({
         }
     ]
 };
-
 			var ctx = this.$.myChart.getContext("2d");
-			var myNewChart = new Chart(ctx).Bar(data);
+			
+
 		}
 	});
 Polymer({

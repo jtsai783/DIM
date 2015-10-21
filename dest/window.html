@@ -3,10 +3,10 @@
     <script src="../bower_components/q/q.js"></script>
     <script src="../bower_components/qwest/qwest.min.js"></script>
     <script src="../bower_components/underscore/underscore-min.js"></script>
-    <script src="../bower_components/Chart.js/Chart.js"></script>
+    <script src="../scripts/Chart.min.js"></script>
+    <script src="../scripts/globals.js"></script>
     <style is="custom-style" include="reset-styles"></style>
     <style is="custom-style" include="doc-styles"></style>
-    <script src="../scripts/globals.js"></script>
     </head>
   <body><div hidden="" by-vulcanize=""><dom-module id="reset-styles" assetpath="/">
 <template>
@@ -64,14 +64,13 @@
 </dom-module><dom-module id="doc-styles" assetpath="/">
 <template>
 	<style>
-   #background {
+   html {
       width: 100%;
       height: 100%;
       background: 
       radial-gradient(ellipse at center, rgba(0,0,0,0) 0%,rgba(0,0,0,0.58) 100%),
       linear-gradient(45deg, rgba(176,181,161,1) 0%,rgba(176,181,161,1) 32%,rgba(94,140,147,1) 67%,rgba(94,140,147,1) 100%);
-      overflow: scroll;
-      z-index: -1000;
+      background-attachment: fixed;
    }
    </style>
 </template>
@@ -95,6 +94,7 @@
 			<div>
 				<canvas id="myChart" width="400" height="400"></canvas>
 			</div>
+			fucking fill in something
 		</div>
 	</template>
 
