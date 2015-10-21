@@ -5,7 +5,7 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}">
-			<item-card item="{{item}}"></item-card>
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
     </template>
 	</template>
 
@@ -17,7 +17,8 @@
 				type: String,
 				observer: "onFilterChange"
 			},
-			displayItems: Array
+			displayItems: Array,
+			chartMaxValue: Number
 		},
 		onFilterChange: function(newVal, oldVal){
 			var mapping = DIM.filterMapping[newVal];
@@ -26,6 +27,17 @@
 				items = items[el];
 			});
 			this.displayItems = items;
+			this.getChartMaxValue();
+		},
+		getChartMaxValue: function(){
+			var maxVal = 0;
+			_.each(this.displayItems, function(item){
+				var statVal = _.values(item.baseStat)
+											.concat(_.values(item.hiddenStats))
+											.concat(_.values(item.stats));
+				maxVal = _.max(statVal);
+			});
+			this.chartMaxValue = maxVal;
 		}
 	});
 	</script>

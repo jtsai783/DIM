@@ -7,7 +7,8 @@
     <script src="../scripts/globals.js"></script>
     <style is="custom-style" include="reset-styles"></style>
     <style is="custom-style" include="doc-styles"></style>
-    </head>
+    <script src="../bower_components/Chart.HorizontalBar.js/Chart.HorizontalBar.js"></script>
+</head>
   <body><div hidden="" by-vulcanize=""><dom-module id="reset-styles" assetpath="/">
 <template>
 	<style>
@@ -80,21 +81,28 @@
 
 	<template>
 		<style>
+			:host {
+				display: block;
+			}
 			.outer{
-				height: 500px;
 				margin: 20px;
+				height: 250px;
 				background-color: rgba(107, 107, 107, 0.4);
+				width: calc(100%-20px);
+			}
+			.inline {
+				display: inline-block;
+			}
+
+			.chart {
+				width: 30%;
+				height: 100%;
 			}
 		</style>
 
 		<div class="outer">
-			<div>
-				<img src="{{itemIcon(item.icon)}}">
-			</div>
-			<div>
-				<canvas id="myChart" width="400" height="400"></canvas>
-			</div>
-			fucking fill in something
+			<img src="{{itemIcon(item.icon)}}">
+			<canvas id="stats" class="chart"></canvas>
 		</div>
 	</template>
 
@@ -102,7 +110,7 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}">
-			<item-card item="{{item}}"></item-card>
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
     </template>
 	</template>
 

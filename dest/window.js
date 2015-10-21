@@ -6373,36 +6373,34 @@ this.fire('dom-change');
 Polymer({
 		is: "item-card",
 		properties: {
-			item: Object
+			item: Object,
+			maxval: Number
 		},
 		itemIcon: function(iconFilename){
 			return "../icons/" + iconFilename;
 		},
 		ready: function(){
 			var data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [
-        {
-            label: "My First dataset",
-            fillColor: "rgba(220,220,220,0.5)",
-            strokeColor: "rgba(220,220,220,0.8)",
-            highlightFill: "rgba(220,220,220,0.75)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data: [65, 59, 80, 81, 56, 55, 40]
-        },
-        {
-            label: "My Second dataset",
-            fillColor: "rgba(151,187,205,0.5)",
-            strokeColor: "rgba(151,187,205,0.8)",
-            highlightFill: "rgba(151,187,205,0.75)",
-            highlightStroke: "rgba(151,187,205,1)",
-            data: [28, 48, 40, 19, 86, 27, 90]
-        }
-    ]
-};
-			var ctx = this.$.myChart.getContext("2d");
-			
-
+				labels: _.keys(this.item.hiddenStats).reverse().concat(_.keys(this.item.stats).reverse()),
+				datasets: [{
+					fillColor: "rgba(255,255,255, 1)",
+					strokeColor: "rgba(255,255,255,0.8)",
+					data: _.values(this.item.hiddenStats).reverse().concat(_.values(this.item.stats).reverse())
+				}]
+			};
+			var ctx = this.$.stats.getContext("2d");
+			var newChart = null;
+			var chartOptions = {
+				scaleOverride: true,
+				scaleSteps: Math.ceil(this.maxval/10),
+				scaleStepWidth: 10,
+				scaleStartValue: 0,
+				scaleGridLineColor : "rgba(255,255,255,.05)",
+				barValueSpacing : 3
+			};
+			setTimeout(function() {
+			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
+			}, 0);
 		}
 	});
 Polymer({
@@ -6412,7 +6410,8 @@ Polymer({
 				type: String,
 				observer: "onFilterChange"
 			},
-			displayItems: Array
+			displayItems: Array,
+			chartMaxValue: Number
 		},
 		onFilterChange: function(newVal, oldVal){
 			var mapping = DIM.filterMapping[newVal];
@@ -6421,6 +6420,17 @@ Polymer({
 				items = items[el];
 			});
 			this.displayItems = items;
+			this.getChartMaxValue();
+		},
+		getChartMaxValue: function(){
+			var maxVal = 0;
+			_.each(this.displayItems, function(item){
+				var statVal = _.values(item.baseStat)
+											.concat(_.values(item.hiddenStats))
+											.concat(_.values(item.stats));
+				maxVal = _.max(statVal);
+			});
+			this.chartMaxValue = maxVal;
 		}
 	});
 Polymer({
