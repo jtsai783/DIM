@@ -1,5 +1,5 @@
 Chart.defaults.global.scaleFontColor = "#FFF";
-Chart.defaults.global.scaleFontSize = 10;
+Chart.defaults.global.scaleFontSize = 15;
 Chart.defaults.global.responsive = false;
 
 
@@ -45,3 +45,5 @@ DIM.inventoryFilter = ["Shader", "Engram", "Subclass", "Vehicle",
 
 DIM.filterMapping = {};
 DIM.filterMapping["scout-rifle"] = ["Scout Rifle", "All"];
+DIM.filterMapping["auto-rifle"] = ["Auto Rifle", "All"];
+DIM.filterMapping["hunter-class-armor"] = ["Class Armor", "Hunter"];

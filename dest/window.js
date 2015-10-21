@@ -6380,13 +6380,18 @@ Polymer({
 			return "../icons/" + iconFilename;
 		},
 		ready: function(){
+			var labels = _.keys(this.item.hiddenStats).reverse().concat(_.keys(this.item.stats).reverse());
+			labels = _.map(labels, function(label){
+				return label.toUpperCase();
+			});
 			var data = {
-				labels: _.keys(this.item.hiddenStats).reverse().concat(_.keys(this.item.stats).reverse()),
-				datasets: [{
-					fillColor: "rgba(255,255,255, 1)",
-					strokeColor: "rgba(255,255,255,0.8)",
-					data: _.values(this.item.hiddenStats).reverse().concat(_.values(this.item.stats).reverse())
-				}]
+				labels: labels,
+				datasets: [
+					{
+						fillColor: "rgba(255,255,255, 1)",
+						data: _.values(this.item.hiddenStats).reverse().concat(_.values(this.item.stats).reverse())
+					}
+				]
 			};
 			var ctx = this.$.stats.getContext("2d");
 			var newChart = null;
@@ -6396,7 +6401,7 @@ Polymer({
 				scaleStepWidth: 10,
 				scaleStartValue: 0,
 				scaleGridLineColor : "rgba(255,255,255,.05)",
-				barValueSpacing : 3
+				barValueSpacing : 1
 			};
 			setTimeout(function() {
 			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
@@ -6412,6 +6417,9 @@ Polymer({
 			},
 			displayItems: Array,
 			chartMaxValue: Number
+		},
+		itemSort: function(a, b){
+			return b.stats.Range - a.stats.Range;
 		},
 		onFilterChange: function(newVal, oldVal){
 			var mapping = DIM.filterMapping[newVal];

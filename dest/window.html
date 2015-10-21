@@ -95,7 +95,7 @@
 			}
 
 			.chart {
-				width: 30%;
+				width: 50%;
 				height: 100%;
 			}
 		</style>
@@ -109,7 +109,7 @@
 	</dom-module><dom-module id="my-inventory" assetpath="/">
 
 	<template>
-		<template is="dom-repeat" items="{{displayItems}}">
+		<template is="dom-repeat" items="{{displayItems}}" sort="itemSort">
 			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
     </template>
 	</template>

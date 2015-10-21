@@ -4,7 +4,7 @@
 <dom-module id="my-inventory">
 
 	<template>
-		<template is="dom-repeat" items="{{displayItems}}">
+		<template is="dom-repeat" items="{{displayItems}}"  sort="itemSort">
 			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
     </template>
 	</template>
@@ -19,6 +19,9 @@
 			},
 			displayItems: Array,
 			chartMaxValue: Number
+		},
+		itemSort: function(a, b){
+			return b.stats.Range - a.stats.Range;
 		},
 		onFilterChange: function(newVal, oldVal){
 			var mapping = DIM.filterMapping[newVal];
