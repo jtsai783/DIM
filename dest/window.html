@@ -7,7 +7,10 @@
     <script src="../scripts/globals.js"></script>
     <style is="custom-style" include="reset-styles"></style>
     <style is="custom-style" include="doc-styles"></style>
-    </head>
+    <script src="../bower_components/Chart.HorizontalBar.js/Chart.HorizontalBar.js"></script>
+
+
+</head>
   <body><div hidden="" by-vulcanize=""><dom-module id="reset-styles" assetpath="/">
 <template>
 	<style>
@@ -81,25 +84,94 @@
 	<template>
 		<style>
 			:host {
-				display: inline-block;
-				min-width: 150px;
-			}
-			.outer{
 				margin: 10px;
+				display: inline-block;
+				width: calc(25% - 3px - 20px);
 				background-color: rgba(107, 107, 107, 0.4);
-				width: calc(100%-10px);
 			}
 			.chart {
-				padding: 10px;
 				display: block;
+				width: 90%;
+				margin: auto;
+			}
+
+			.light-stat{
+				font-size: 5em;
+			}
+
+			#title{
+				/*min-height: 50px;*/
+				display: block;
+				padding: 10px;
+				color: black;
+				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+				font-size: 1.5em;
+				font-weight: 300;
+				margin-bottom: 10px;
+			}
+
+			.icon{
+				height: 75px;
+				margin-left: 10px;
+			}
+
+			#light {
+				display: inline-block;
+				height: 100%;
+				margin: 10px;
+				color: white;
+				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+				font-size: 5em;
+				font-weight: 500;
+			}
+			#talent-grid{
+				max-width: 80%;
+				margin-top: 15px;
+				margin-bottom: 15px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+			.talent-row{
+				/*background: yellow;*/
+			}
+			.talent-cell{
+				display: inline-block;
+				/*background: red;*/
+				width: 18%;
+			}
+			.talent-image {
+				width: 100%;
+			}
+
+			.not-activated{
+				opacity: 0.2;
 			}
 		</style>
 
-		<div class="outer">
-			<img src="{{itemIcon(item.icon)}}">
+			<div id="title">
+				<span>{{upcaseName(item.name)}}</span>
+			</div>
+			<div>
+				<img src="{{itemIcon(item.icon)}}" class="icon">
+				<div id="light">
+					<span>{{primaryStat(item.primaryStat)}}</span>		
+				</div>
+			</div>
+			
 			<canvas id="stats" class="chart"></canvas>
-			<canvas id="hiddenstats" class="chart"></canvas>
-		</div>
+			<div id="talent-grid">
+				<template is="dom-repeat" items="{{item.talentGrid}}" as="talentrow">
+					<div class="talent-row">
+						<template is="dom-repeat" items="{{talentrow}}" as="talentcell">
+							<div class="talent-cell">
+								<template is="dom-if" if="{{iconCondition(talentcell)}}">
+									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
+								</template>
+							</div>
+						</template>
+					</div>
+				</template>
+			</div>
 	</template>
 
 	</dom-module><dom-module id="my-inventory" assetpath="/">

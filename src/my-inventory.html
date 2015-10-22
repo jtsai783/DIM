@@ -38,7 +38,10 @@
 				var statVal = _.values(item.baseStat)
 											.concat(_.values(item.hiddenStats))
 											.concat(_.values(item.stats));
-				maxVal = _.max(statVal);
+				var max = _.max(statVal);
+				if (max >= maxVal){
+					maxVal = max;
+				}
 			});
 			this.chartMaxValue = maxVal;
 		}

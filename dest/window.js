@@ -6376,25 +6376,61 @@ Polymer({
 			item: Object,
 			maxval: Number
 		},
+		imgClass: function(talentcell){
+			if (talentcell.isActivated){
+				return "talent-image"
+			} else {
+				return "talent-image not-activated"
+			}
+		},
+		iconCondition: function(talentcell){
+			return !!talentcell.icon && !talentcell.hidden
+		},
 		itemIcon: function(iconFilename){
 			return "../icons/" + iconFilename;
 		},
+		toolTip: function(talentcell){
+			return talentcell.name + "\n" + talentcell.description;
+		},
+		perkIcon:function(iconName){
+			return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
+		},
+		primaryStat: function(stat){
+			return _.values(stat)[0];
+		},
+		upcaseName: function(name){
+			return name.toUpperCase();
+		},
 		ready: function(){
+			switch(this.item.damageType){
+				case "Kinetic":
+					this.$.title.style.backgroundColor = "white";
+					break;
+				case "Arc":
+					this.$.title.style.backgroundColor = "rgb(61, 165, 229)";
+					break;
+				case "Void":
+					this.$.title.style.backgroundColor = "rgb(155, 65, 234)";
+					break;
+				case "Solar":
+					this.$.title.style.backgroundColor = "rgb(232, 106, 64)";
+					break;
+			}
 			this.drawStat();
-			this.drawHiddenStat();
 		},
 		drawStat: function() {
-			var labels = _.keys(this.item.stats).reverse();
+			var labels = _.keys(this.item.stats).concat(_.keys(this.item.hiddenStats)).reverse();
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
+			var graphHeight = (labels.length * 20)  + 40;
+			this.$.stats.height = graphHeight;
 			var data = {
 				labels: labels,
 				datasets: [
 					{
-						fillColor: "rgba(255,255,255, 0.2)",
-						strokeColor: "rgba(255,255,255, 1)",
-						data: _.values(this.item.stats).reverse()
+						fillColor: "rgba(255,255,255, 1)",
+						data: _.values(this.item.stats).concat(_.values(this.item.hiddenStats)).reverse()
 					},
 				]
 			};
@@ -6405,44 +6441,13 @@ Polymer({
 				scaleSteps: Math.ceil(this.maxval/10),
 				scaleStepWidth: 10,
 				scaleStartValue: 0,
-				datasetStrokeWidth : 2,
-				angleLineColor : "rgba(255,255,255,0.5)",
-				scaleLineColor: "rgba(255,255,255,0.5)",
-				pointLabelFontColor : "#FFF",
+				barValueSpacing : 1,
+				scaleFontColor: "#FFF",
+				scaleShowGridLines : false,
+				scaleFontSize: 12
 			};
 			setTimeout(function() {
-			    newChart = new Chart(ctx).Radar(data, chartOptions);
-			}, 0);
-		},
-		drawHiddenStat: function() {
-			var labels = _.keys(this.item.hiddenStats).reverse();
-			labels = _.map(labels, function(label){
-				return label.toUpperCase();
-			});
-			var data = {
-				labels: labels,
-				datasets: [
-					{
-						fillColor: "rgba(255,255,255, 0.2)",
-						strokeColor: "rgba(255,255,255, 1)",
-						data: _.values(this.item.hiddenStats).reverse()
-					},
-				]
-			};
-			var ctx = this.$.hiddenstats.getContext("2d");
-			var newChart = null;
-			var chartOptions = {
-				scaleOverride: true,
-				scaleSteps: Math.ceil(this.maxval/10),
-				scaleStepWidth: 10,
-				scaleStartValue: 0,
-				datasetStrokeWidth : 2,
-				angleLineColor : "rgba(255,255,255,0.5)",
-				scaleLineColor: "rgba(255,255,255,0.5)",
-				pointLabelFontColor : "#FFF",
-			};
-			setTimeout(function() {
-			    newChart = new Chart(ctx).Radar(data, chartOptions);
+			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
 			}, 0);
 		}
 	});
@@ -6474,7 +6479,10 @@ Polymer({
 				var statVal = _.values(item.baseStat)
 											.concat(_.values(item.hiddenStats))
 											.concat(_.values(item.stats));
-				maxVal = _.max(statVal);
+				var max = _.max(statVal);
+				if (max >= maxVal){
+					maxVal = max;
+				}
 			});
 			this.chartMaxValue = maxVal;
 		}
@@ -6544,7 +6552,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "auto-rifle";
+				that.filter = "scout-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
@@ -6689,28 +6697,30 @@ Polymer({
 		},
 		getTalent: function(item){
 			var returnGrid = [];
-			// if (typeof DIM.talents[item.talentGridHash] !== "undefined"){
-			// 	var baseGridNodes = DIM.talents[item.talentGridHash].nodes;
-			// 	var itemNodes = item.nodes;
-			// 	_.each(baseGridNodes, function(node){
-			// 		if (node.row >= 0 && node.column >= 0){
-			// 			var currentItemNode = _.find(itemNodes, function(itemNode){
-			// 				return itemNode.nodeHash === node.nodeHash;
-			// 			});
-			// 			var step = node.steps[currentItemNode.stepIndex];
-			// 			var nodeObj = {};
-			// 			nodeObj.name = step.nodeStepName;
-			// 			nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-			// 			nodeObj.description = step.nodeStepDescription;
-			// 			if (typeof returnGrid[node.row] !== "undefined"){
-			// 				returnGrid[node.row][node.column] = nodeObj;
-			// 			} else {
-			// 				returnGrid[node.row] = [];
-			// 				returnGrid[node.row][node.column] = nodeObj;
-			// 			}
-			// 		}
-			// 	});
-			// }
+			if (typeof DIM.talents[item.talentGridHash] !== "undefined"){
+				var baseGridNodes = DIM.talents[item.talentGridHash].nodes;
+				var itemNodes = item.nodes;
+				_.each(baseGridNodes, function(node){
+					if (node.row >= 0 && node.column >= 0){
+						var currentItemNode = _.find(itemNodes, function(itemNode){
+							return itemNode.nodeHash === node.nodeHash;
+						});
+						var step = node.steps[currentItemNode.stepIndex];
+						var nodeObj = {};
+						nodeObj.name = step.nodeStepName;
+						nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+						nodeObj.description = step.nodeStepDescription;
+						nodeObj.hidden = currentItemNode.hidden;
+						nodeObj.isActivated = currentItemNode.isActivated;
+						if (typeof returnGrid[node.row] !== "undefined"){
+							returnGrid[node.row][node.column] = nodeObj;
+						} else {
+							returnGrid[node.row] = [];
+							returnGrid[node.row][node.column] = nodeObj;
+						}
+					}
+				});
+			}
 			return returnGrid;
 		}
 	});
