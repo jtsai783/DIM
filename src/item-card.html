@@ -10,14 +10,16 @@
 		<style>
 			:host {
 				margin: 10px;
-				display: inline-block;
+				display: inline-table;
 				width: calc(25% - 3px - 20px);
 				background-color: rgba(107, 107, 107, 0.4);
 			}
 			.chart {
 				display: block;
 				width: 90%;
-				margin: auto;
+				margin-left: auto;
+				margin-right: auto;
+				margin-bottom: 15px;
 			}
 
 			.light-stat{
@@ -51,7 +53,7 @@
 			}
 			#talent-grid{
 				max-width: 80%;
-				margin-top: 15px;
+				/*height: 150px;*/
 				margin-bottom: 15px;
 				margin-left: auto;
 				margin-right: auto;
@@ -62,7 +64,7 @@
 			.talent-cell{
 				display: inline-block;
 				/*background: red;*/
-				width: 18%;
+				width: 14%;
 			}
 			.talent-image {
 				width: 100%;
@@ -70,6 +72,14 @@
 
 			.not-activated{
 				opacity: 0.2;
+			}
+
+			.graph-title{
+				margin: auto;
+				width: -webkit-fit-content;
+				/*display: inline-block;*/
+				color: white;
+				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 			}
 		</style>
 
@@ -82,7 +92,7 @@
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
 			</div>
-			
+			<div class="graph-title">Current/[Base] Stat</div>
 			<canvas id="stats" class="chart"></canvas>
 			<div id="talent-grid">
 				<template is="dom-repeat" items="{{item.talentGrid}}" as="talentrow">
@@ -133,9 +143,6 @@
 		},
 		ready: function(){
 			switch(this.item.damageType){
-				case "Kinetic":
-					this.$.title.style.backgroundColor = "white";
-					break;
 				case "Arc":
 					this.$.title.style.backgroundColor = "rgb(61, 165, 229)";
 					break;
@@ -145,11 +152,18 @@
 				case "Solar":
 					this.$.title.style.backgroundColor = "rgb(232, 106, 64)";
 					break;
+				default:
+					this.$.title.style.backgroundColor = "rgb(186, 186, 186)";
+					break;
 			}
 			this.drawStat();
 		},
 		drawStat: function() {
-			var labels = _.keys(this.item.stats).concat(_.keys(this.item.hiddenStats)).reverse();
+			var hiddenKeys = _.keys(this.item.hiddenStats);
+			hiddenKeys = _.map(hiddenKeys, function(key){
+				return "[" + key + "]"
+			});
+			var labels = _.keys(this.item.stats).concat(hiddenKeys).reverse();
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});

@@ -6403,9 +6403,6 @@ Polymer({
 		},
 		ready: function(){
 			switch(this.item.damageType){
-				case "Kinetic":
-					this.$.title.style.backgroundColor = "white";
-					break;
 				case "Arc":
 					this.$.title.style.backgroundColor = "rgb(61, 165, 229)";
 					break;
@@ -6415,11 +6412,18 @@ Polymer({
 				case "Solar":
 					this.$.title.style.backgroundColor = "rgb(232, 106, 64)";
 					break;
+				default:
+					this.$.title.style.backgroundColor = "rgb(186, 186, 186)";
+					break;
 			}
 			this.drawStat();
 		},
 		drawStat: function() {
-			var labels = _.keys(this.item.stats).concat(_.keys(this.item.hiddenStats)).reverse();
+			var hiddenKeys = _.keys(this.item.hiddenStats);
+			hiddenKeys = _.map(hiddenKeys, function(key){
+				return "[" + key + "]"
+			});
+			var labels = _.keys(this.item.stats).concat(hiddenKeys).reverse();
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
@@ -6552,7 +6556,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "scout-rifle";
+				that.filter = "shotgun";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){

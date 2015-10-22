@@ -48,3 +48,4 @@ DIM.filterMapping["hunter-class-armor"] = ["Class Armor", "Hunter"];
 DIM.filterMapping["fusion-rifle"] = ["Fusion Rifle", "All"];
 DIM.filterMapping["sword"] = ["Sword", "All"];
 DIM.filterMapping["shotgun"] = ["Shotgun", "All"];
+DIM.filterMapping["hunter-artifact"] = ["Artifact", "Hunter"];
