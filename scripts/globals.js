@@ -1,6 +1,4 @@
-Chart.defaults.global.scaleFontColor = "#FFF";
-Chart.defaults.global.scaleFontSize = 15;
-Chart.defaults.global.responsive = false;
+
 
 
 var DIM = DIM || {};

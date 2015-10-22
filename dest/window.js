@@ -6380,7 +6380,11 @@ Polymer({
 			return "../icons/" + iconFilename;
 		},
 		ready: function(){
-			var labels = _.keys(this.item.hiddenStats).reverse().concat(_.keys(this.item.stats).reverse());
+			this.drawStat();
+			this.drawHiddenStat();
+		},
+		drawStat: function() {
+			var labels = _.keys(this.item.stats).reverse();
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
@@ -6388,9 +6392,10 @@ Polymer({
 				labels: labels,
 				datasets: [
 					{
-						fillColor: "rgba(255,255,255, 1)",
-						data: _.values(this.item.hiddenStats).reverse().concat(_.values(this.item.stats).reverse())
-					}
+						fillColor: "rgba(255,255,255, 0.2)",
+						strokeColor: "rgba(255,255,255, 1)",
+						data: _.values(this.item.stats).reverse()
+					},
 				]
 			};
 			var ctx = this.$.stats.getContext("2d");
@@ -6400,11 +6405,44 @@ Polymer({
 				scaleSteps: Math.ceil(this.maxval/10),
 				scaleStepWidth: 10,
 				scaleStartValue: 0,
-				scaleGridLineColor : "rgba(255,255,255,.05)",
-				barValueSpacing : 1
+				datasetStrokeWidth : 2,
+				angleLineColor : "rgba(255,255,255,0.5)",
+				scaleLineColor: "rgba(255,255,255,0.5)",
+				pointLabelFontColor : "#FFF",
 			};
 			setTimeout(function() {
-			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
+			    newChart = new Chart(ctx).Radar(data, chartOptions);
+			}, 0);
+		},
+		drawHiddenStat: function() {
+			var labels = _.keys(this.item.hiddenStats).reverse();
+			labels = _.map(labels, function(label){
+				return label.toUpperCase();
+			});
+			var data = {
+				labels: labels,
+				datasets: [
+					{
+						fillColor: "rgba(255,255,255, 0.2)",
+						strokeColor: "rgba(255,255,255, 1)",
+						data: _.values(this.item.hiddenStats).reverse()
+					},
+				]
+			};
+			var ctx = this.$.hiddenstats.getContext("2d");
+			var newChart = null;
+			var chartOptions = {
+				scaleOverride: true,
+				scaleSteps: Math.ceil(this.maxval/10),
+				scaleStepWidth: 10,
+				scaleStartValue: 0,
+				datasetStrokeWidth : 2,
+				angleLineColor : "rgba(255,255,255,0.5)",
+				scaleLineColor: "rgba(255,255,255,0.5)",
+				pointLabelFontColor : "#FFF",
+			};
+			setTimeout(function() {
+			    newChart = new Chart(ctx).Radar(data, chartOptions);
 			}, 0);
 		}
 	});
@@ -6506,7 +6544,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "scout-rifle";
+				that.filter = "auto-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
