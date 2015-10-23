@@ -106,6 +106,7 @@
 			#title{
 				/*min-height: 50px;*/
 				display: block;
+				width: auto;
 				padding: 10px;
 				color: black;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -157,16 +158,27 @@
 				color: white;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 			}
+
+			.title-icon {
+				height: 20px;
+				float: right;
+			}
+
+			.item-name {
+				width: -webkit-fit-content;
+				margin: 10px;
+			}
 		</style>
 
-			<div id="title">
+			<a href="#" id="title">
 				<span>{{upcaseName(item.name)}}</span>
-			</div>
+			</a>
 			<div>
 				<img src="{{itemIcon(item.icon)}}" class="icon">
 				<div id="light">
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
+				<img src="{{locationIcon(item)}}" class="icon">
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
 			<canvas id="stats" class="chart"></canvas>

@@ -6384,6 +6384,14 @@ Polymer({
 				return "talent-image not-activated";
 			}
 		},
+		locationIcon: function(item){
+			if (item.location.name === "Vault"){
+				return item.location.icon;
+			} else {
+				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+				return "../icons/" + iconName;
+			}
+		},
 		iconCondition: function(talentcell){
 			return !!talentcell.icon && !talentcell.hidden;
 		},
@@ -6613,18 +6621,22 @@ Polymer({
 		},
 		buildFromChars: function(){
 			var that = this;
+			
 			_.each(this.charInv, function(inv){
-				that.buildFromBuckets(inv, inv.characterId);
+				var character = _.find(that.characters, function(character){
+					return character.characterBase.characterId === inv.characterId;
+				});
+				that.buildFromBuckets(inv, {name: inv.characterId, icon: character.emblemPath});
 			});
 		},
 		buildFromVault: function(){
 			var that = this;
-			this.buildFromBuckets(this.vaultInv.inventory, "Vault");
+			this.buildFromBuckets(this.vaultInv.inventory, {name: "Vault", icon: "../myicons/vault.png"});
 		},
 		buildFromBuckets: function(inv, location){
 			var that = this;
 			var buckets = null;
-			if (location === "Vault"){
+			if (location.name === "Vault"){
 				buckets = inv.buckets.Item;
 			} else {
 				buckets = inv.buckets.Equippable;
@@ -6711,6 +6723,9 @@ Polymer({
 			normalizedItem.talentGrid = this.getTalent(vaultItem);
 			normalizedItem.isEquipped = vaultItem.isEquipped;
 			normalizedItem.damageType = DIM.damageType[vaultItem.damageType];
+			normalizedItem.instanceId = vaultItem.itemInstanceId;
+			normalizedItem.itemHash = vaultItem.itemHash;
+			normalizedItem.transferStatus = vaultItem.transferStatus;
 			return normalizedItem;
 		},
 		getStat: function(archetype) {
