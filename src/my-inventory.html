@@ -5,7 +5,7 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}"  sort="itemSort">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow "{{gridMaxRow}}"></item-card>
     </template>
 	</template>
 
@@ -31,6 +31,7 @@
 			});
 			this.displayItems = items;
 			this.getChartMaxValue();
+			this.padPerkGrid();
 		},
 		getChartMaxValue: function(){
 			var maxVal = 0;
@@ -44,6 +45,27 @@
 				}
 			});
 			this.chartMaxValue = maxVal;
+		},
+		padPerkGrid: function(){
+			var maxVal = 0;
+			_.each(this.displayItems, function(item){
+				if(item.talentGrid.length > maxVal){
+					maxVal = item.talentGrid.length;
+				}
+			});
+			
+			var padding = {
+				padding: true
+			};
+			this.displayItems = _.map(this.displayItems, function(item){
+				if(item.talentGrid.length < maxVal){
+					var diff = maxVal - item.talentGrid.length;
+					for (i = 0; i < diff; i++) { 
+					    item.talentGrid.push([padding]);
+					}
+				}
+				return item;
+			});
 		}
 	});
 	</script>

@@ -85,9 +85,11 @@
 		<style>
 			:host {
 				margin: 10px;
-				display: inline-table;
+				display: inline-block;
 				width: calc(25% - 3px - 20px);
 				background-color: rgba(107, 107, 107, 0.4);
+				min-width: 300px;
+				max-width: 400px;
 			}
 			.chart {
 				display: block;
@@ -128,13 +130,12 @@
 			}
 			#talent-grid{
 				max-width: 80%;
-				/*height: 150px;*/
+				/*height: 200px;*/
 				margin-bottom: 15px;
 				margin-left: auto;
 				margin-right: auto;
 			}
 			.talent-row{
-				/*background: yellow;*/
 			}
 			.talent-cell{
 				display: inline-block;
@@ -177,6 +178,9 @@
 								<template is="dom-if" if="{{iconCondition(talentcell)}}">
 									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
 								</template>
+								<template is="dom-if" if="{{talentcell.padding}}">
+									<img class="talent-image" src="../icons/empty.png">
+								</template>
 							</div>
 						</template>
 					</div>
@@ -188,7 +192,7 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}" sort="itemSort">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}"></item-card>
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="" "{{gridmaxrow}}"=""></item-card>
     </template>
 	</template>
 

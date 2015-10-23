@@ -6374,17 +6374,18 @@ Polymer({
 		is: "item-card",
 		properties: {
 			item: Object,
-			maxval: Number
+			maxval: Number,
+			maxrow: Number
 		},
 		imgClass: function(talentcell){
 			if (talentcell.isActivated){
-				return "talent-image"
+				return "talent-image";
 			} else {
-				return "talent-image not-activated"
+				return "talent-image not-activated";
 			}
 		},
 		iconCondition: function(talentcell){
-			return !!talentcell.icon && !talentcell.hidden
+			return !!talentcell.icon && !talentcell.hidden;
 		},
 		itemIcon: function(iconFilename){
 			return "../icons/" + iconFilename;
@@ -6421,7 +6422,7 @@ Polymer({
 		drawStat: function() {
 			var hiddenKeys = _.keys(this.item.hiddenStats);
 			hiddenKeys = _.map(hiddenKeys, function(key){
-				return "[" + key + "]"
+				return "[" + key + "]";
 			});
 			var labels = _.keys(this.item.stats).concat(hiddenKeys).reverse();
 			labels = _.map(labels, function(label){
@@ -6476,6 +6477,7 @@ Polymer({
 			});
 			this.displayItems = items;
 			this.getChartMaxValue();
+			this.padPerkGrid();
 		},
 		getChartMaxValue: function(){
 			var maxVal = 0;
@@ -6489,6 +6491,27 @@ Polymer({
 				}
 			});
 			this.chartMaxValue = maxVal;
+		},
+		padPerkGrid: function(){
+			var maxVal = 0;
+			_.each(this.displayItems, function(item){
+				if(item.talentGrid.length > maxVal){
+					maxVal = item.talentGrid.length;
+				}
+			});
+			
+			var padding = {
+				padding: true
+			};
+			this.displayItems = _.map(this.displayItems, function(item){
+				if(item.talentGrid.length < maxVal){
+					var diff = maxVal - item.talentGrid.length;
+					for (i = 0; i < diff; i++) { 
+					    item.talentGrid.push([padding]);
+					}
+				}
+				return item;
+			});
 		}
 	});
 Polymer({
@@ -6556,7 +6579,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "shotgun";
+				that.filter = "scout-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){

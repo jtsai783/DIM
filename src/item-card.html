@@ -10,9 +10,11 @@
 		<style>
 			:host {
 				margin: 10px;
-				display: inline-table;
+				display: inline-block;
 				width: calc(25% - 3px - 20px);
 				background-color: rgba(107, 107, 107, 0.4);
+				min-width: 300px;
+				max-width: 400px;
 			}
 			.chart {
 				display: block;
@@ -53,13 +55,12 @@
 			}
 			#talent-grid{
 				max-width: 80%;
-				/*height: 150px;*/
+				/*height: 200px;*/
 				margin-bottom: 15px;
 				margin-left: auto;
 				margin-right: auto;
 			}
 			.talent-row{
-				/*background: yellow;*/
 			}
 			.talent-cell{
 				display: inline-block;
@@ -102,6 +103,9 @@
 								<template is="dom-if" if="{{iconCondition(talentcell)}}">
 									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
 								</template>
+								<template is="dom-if" if="{{talentcell.padding}}">
+									<img class="talent-image" src="../icons/empty.png">
+								</template>
 							</div>
 						</template>
 					</div>
@@ -114,17 +118,18 @@
 		is: "item-card",
 		properties: {
 			item: Object,
-			maxval: Number
+			maxval: Number,
+			maxrow: Number
 		},
 		imgClass: function(talentcell){
 			if (talentcell.isActivated){
-				return "talent-image"
+				return "talent-image";
 			} else {
-				return "talent-image not-activated"
+				return "talent-image not-activated";
 			}
 		},
 		iconCondition: function(talentcell){
-			return !!talentcell.icon && !talentcell.hidden
+			return !!talentcell.icon && !talentcell.hidden;
 		},
 		itemIcon: function(iconFilename){
 			return "../icons/" + iconFilename;
@@ -161,7 +166,7 @@
 		drawStat: function() {
 			var hiddenKeys = _.keys(this.item.hiddenStats);
 			hiddenKeys = _.map(hiddenKeys, function(key){
-				return "[" + key + "]"
+				return "[" + key + "]";
 			});
 			var labels = _.keys(this.item.stats).concat(hiddenKeys).reverse();
 			labels = _.map(labels, function(label){
