@@ -6377,6 +6377,13 @@ Polymer({
 			maxval: Number,
 			maxrow: Number
 		},
+		toggleStore: function (){
+			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {
+				this.$.store.style.display = "block";
+			} else {
+				this.$.store.style.display = "none";
+			}
+		},
 		imgClass: function(talentcell){
 			if (talentcell.isActivated){
 				return "talent-image";
@@ -6461,7 +6468,8 @@ Polymer({
 				barValueSpacing : 1,
 				scaleFontColor: "#FFF",
 				scaleShowGridLines : false,
-				scaleFontSize: 12
+				scaleFontSize: 12,
+				responsive: true
 			};
 			setTimeout(function() {
 			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
@@ -6591,7 +6599,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "shotgun";
+				that.filter = "auto-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){

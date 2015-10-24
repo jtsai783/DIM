@@ -13,14 +13,14 @@
 				display: inline-block;
 				width: calc(25% - 3px - 20px);
 				background-color: rgba(107, 107, 107, 0.4);
-				min-width: 300px;
+				min-width: 250px;
 				max-width: 400px;
+				position: relative;
 			}
 			.chart {
 				display: block;
 				width: 90%;
-				margin-left: auto;
-				margin-right: auto;
+				margin: auto;
 				margin-bottom: 15px;
 			}
 
@@ -42,24 +42,25 @@
 			}
 
 			.icon{
-				height: 96px;
+				height: 6vw;
 				margin-left: 10px;
 			}
 
 			#locationicon {
-				height: 50px;
+				height: 3.5vw;
 				border-style: solid;
 				border-width: medium;
 				border-color: grey;
+				cursor: pointer;
 			}
 
 			#light {
 				display: inline-block;
-				height: 100%;
+				/*height: 100%;*/
 				margin: 10px;
 				color: white;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-				font-size: 5em;
+				font-size: 5vw;
 				font-weight: 500;
 			}
 			#talent-grid{
@@ -76,7 +77,8 @@
 			.talent-cell{
 				display: inline-block;
 				/*background: red;*/
-				width: 50px;
+				max-width: 50px;
+				width: 3vw;
 			}
 			.talent-image {
 				width: 100%;
@@ -103,20 +105,31 @@
 				width: -webkit-fit-content;
 				margin: 10px;
 			}
+
+			#store{
+				width: 100%;
+				height: 150px;
+				background-color: black;
+				position: absolute;
+				display: none;
+				opacity: 0.5;
+			}
 		</style>
 
-			<a href="#" id="title">
+			<div id="title">
 				<span>{{upcaseName(item.name)}}</span>
-			</a>
-			<div>
+			</div>
+			<div style="position: relative;">
 				<img src="{{itemIcon(item.icon)}}" class="icon">
 				<div id="light">
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
-				<img src="{{locationIcon(item)}}" id="locationicon">
+				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
+
+				<div id="store">lolol</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
-			<canvas id="stats" class="chart"></canvas>
+			<div class="chart"><canvas id="stats"></canvas></div>
 			<div id="talent-grid">
 				<template is="dom-repeat" items="{{item.talentGrid}}" as="talentrow">
 					<div class="talent-row">
@@ -133,6 +146,7 @@
 					</div>
 				</template>
 			</div>
+
 	</template>
 
 	<script>
@@ -142,6 +156,13 @@
 			item: Object,
 			maxval: Number,
 			maxrow: Number
+		},
+		toggleStore: function (){
+			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {
+				this.$.store.style.display = "block";
+			} else {
+				this.$.store.style.display = "none";
+			}
 		},
 		imgClass: function(talentcell){
 			if (talentcell.isActivated){
@@ -227,7 +248,8 @@
 				barValueSpacing : 1,
 				scaleFontColor: "#FFF",
 				scaleShowGridLines : false,
-				scaleFontSize: 12
+				scaleFontSize: 12,
+				responsive: true
 			};
 			setTimeout(function() {
 			    newChart = new Chart(ctx).HorizontalBar(data, chartOptions);
