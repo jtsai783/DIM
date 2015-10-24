@@ -30,6 +30,7 @@
 
 			#title{
 				/*min-height: 50px;*/
+				text-decoration: none;
 				display: block;
 				width: auto;
 				padding: 10px;
@@ -41,8 +42,15 @@
 			}
 
 			.icon{
-				height: 75px;
+				height: 96px;
 				margin-left: 10px;
+			}
+
+			#locationicon {
+				height: 50px;
+				border-style: solid;
+				border-width: medium;
+				border-color: grey;
 			}
 
 			#light {
@@ -60,13 +68,15 @@
 				margin-bottom: 15px;
 				margin-left: auto;
 				margin-right: auto;
+				overflow-y: hidden;
 			}
 			.talent-row{
+				white-space: nowrap;
 			}
 			.talent-cell{
 				display: inline-block;
 				/*background: red;*/
-				width: 14%;
+				width: 50px;
 			}
 			.talent-image {
 				width: 100%;
@@ -103,7 +113,7 @@
 				<div id="light">
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
-				<img src="{{locationIcon(item)}}" class="icon">
+				<img src="{{locationIcon(item)}}" id="locationicon">
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
 			<canvas id="stats" class="chart"></canvas>
@@ -180,6 +190,10 @@
 				default:
 					this.$.title.style.backgroundColor = "rgb(186, 186, 186)";
 					break;
+			}
+
+			if(this.item.isEquipped){
+				this.$.locationicon.style.borderColor = "gold";
 			}
 			this.drawStat();
 		},

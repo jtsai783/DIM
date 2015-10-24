@@ -6425,6 +6425,10 @@ Polymer({
 					this.$.title.style.backgroundColor = "rgb(186, 186, 186)";
 					break;
 			}
+
+			if(this.item.isEquipped){
+				this.$.locationicon.style.borderColor = "gold";
+			}
 			this.drawStat();
 		},
 		drawStat: function() {
@@ -6587,7 +6591,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "scout-rifle";
+				that.filter = "shotgun";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
