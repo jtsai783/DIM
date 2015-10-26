@@ -27,6 +27,9 @@ qwest.get('../api-manifest/stats.json')
 });
 
 DIM.inventory = {};
+
+DIM.characters = null;
+
 DIM.ignoredStats = ["Inventory Size", "Light"];
 
 DIM.damageType = {};
@@ -36,9 +39,10 @@ DIM.damageType[2] = "Arc";
 DIM.damageType[3] = "Solar";
 DIM.damageType[4] = "Void";
 
-DIM.inventoryFilter = ["Shader", "Engram", "Subclass", "Vehicle",
-										 	"Ship", "Material", "Consum", "Emblem", "Emote", "Default"
-											];
+DIM.inventoryFilter = [
+	"Shader", "Engram", "Subclass", "Vehicle", "Ship", "Material", "Consum",
+	"Emblem", "Emote", "Default"
+];
 
 DIM.filterMapping = {};
 DIM.filterMapping["scout-rifle"] = ["Scout Rifle", "All"];
@@ -49,3 +53,26 @@ DIM.filterMapping["sword"] = ["Sword", "All"];
 DIM.filterMapping["shotgun"] = ["Shotgun", "All"];
 DIM.filterMapping["hunter-artifact"] = ["Artifact", "Hunter"];
 DIM.filterMapping["hunter-helmet"] = ["Helmet", "Hunter"];
+
+DIM.itemState = {};
+DIM.itemState[1] = {left: {}, right: {
+	"action": "unequip"
+}};
+DIM.itemState[2] = {left: {
+	"action": "equip"
+}, right: {
+	"action": "toVault"
+}};
+DIM.itemState[3] = {left: {
+	"action": "fromVault"
+}, right: {
+	"action": "fromVault"
+}};
+DIM.itemState[4] = {left: {
+	"action": "toVault"
+}, right: {
+	"action": "equip"
+}};
+DIM.itemState[5] = {left: {
+	"action": "uneqip"
+}, right: {}};

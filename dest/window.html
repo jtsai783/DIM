@@ -5,6 +5,7 @@
     <script src="../bower_components/underscore/underscore-min.js"></script>
     <script src="../bower_components/Chart.js/Chart.min.js"></script>
     <script src="../scripts/globals.js"></script>
+    <script src="../scripts/transfer-item.js"></script>
     <style is="custom-style" include="reset-styles"></style>
     <style is="custom-style" include="doc-styles"></style>
     <script src="../bower_components/Chart.HorizontalBar.js/Chart.HorizontalBar.js"></script>
@@ -189,6 +190,16 @@
 				display: none;
 				/*opacity: 0.5;*/
 			}
+
+			.charicon{
+				width: 20%;
+				display: inline-block;
+			}
+
+			.chariconimage{
+				width: 100%;
+				cursor: pointer;
+			}
 		</style>
 
 			<div id="title">
@@ -202,10 +213,21 @@
 				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
 
 				<div id="store">
-					<div style="background-color: white;">Store</div>
-					<div></div>
 					<div style="background-color: white;">Equip</div>
-					<div></div>
+					<template is="dom-repeat" items="{{characters}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+						</div>
+					</template>
+					<div style="background-color: white;">Store</div>
+					<template is="dom-repeat" items="{{characters}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
+						</div>
+					</template>
+					<div class="charicon">
+						<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+					</div>
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -235,7 +257,8 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}" sort="itemSort">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="" "{{gridmaxrow}}"=""></item-card>
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="" "{{gridmaxrow}}"="" characters="{{characters}}">
+			</item-card>
     </template>
 	</template>
 
@@ -254,7 +277,7 @@
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
-		<my-inventory filter="{{filter}}">
+		<my-inventory filter="{{filter}}" characters="{{characters}}">
 		</my-inventory>
 	</template>
 

@@ -5,7 +5,13 @@
 
 	<template>
 		<template is="dom-repeat" items="{{displayItems}}"  sort="itemSort">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow "{{gridMaxRow}}"></item-card>
+			<item-card
+				item="{{item}}" 
+				maxval="{{chartMaxValue}}"
+				maxrow "{{gridMaxRow}}"
+				characters="{{characters}}"
+			>
+			</item-card>
     </template>
 	</template>
 
@@ -18,7 +24,8 @@
 				observer: "onFilterChange"
 			},
 			displayItems: Array,
-			chartMaxValue: Number
+			chartMaxValue: Number,
+			characters: Array
 		},
 		itemSort: function(a, b){
 			return b.stats.Range - a.stats.Range;

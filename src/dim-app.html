@@ -4,7 +4,10 @@
 
 <dom-module id="dim-app">
 	<template>
-		<my-inventory filter="{{filter}}">
+		<my-inventory
+			filter="{{filter}}"
+			characters="{{characters}}"
+		>
 		</my-inventory>
 	</template>
 
@@ -14,7 +17,7 @@
 		properties: {
 			filter: String,
 			normalizedInventory: Object,
-			characters: Object,
+			characters: Array,
 			weaponTypeSelection: String,
 			destinyMembershipType: String,
 			destinyMembershipId: String,
@@ -31,6 +34,9 @@
 			var that = this;
 			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
 			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function(cookie){
+				DIM.csrf = cookie.value;
+			});
 
 			Q.all([promiseBungled, promistBungleatk])
 			.then(function(data){
@@ -68,7 +74,7 @@
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "auto-rifle";
+				that.filter = "scout-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
@@ -207,6 +213,7 @@
 			normalizedItem.instanceId = vaultItem.itemInstanceId;
 			normalizedItem.itemHash = vaultItem.itemHash;
 			normalizedItem.transferStatus = vaultItem.transferStatus;
+			normalizedItem.levelReq = vaultItem.equipRequiredLevel;
 			return normalizedItem;
 		},
 		getStat: function(archetype) {

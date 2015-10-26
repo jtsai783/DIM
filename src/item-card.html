@@ -114,6 +114,16 @@
 				display: none;
 				/*opacity: 0.5;*/
 			}
+
+			.charicon{
+				width: 20%;
+				display: inline-block;
+			}
+
+			.chariconimage{
+				width: 100%;
+				cursor: pointer;
+			}
 		</style>
 
 			<div id="title">
@@ -127,10 +137,21 @@
 				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
 
 				<div id="store">
-					<div style="background-color: white;">Store</div>
-					<div></div>
 					<div style="background-color: white;">Equip</div>
-					<div></div>
+					<template is="dom-repeat" items="{{characters}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+						</div>
+					</template>
+					<div style="background-color: white;">Store</div>
+					<template is="dom-repeat" items="{{characters}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
+						</div>
+					</template>
+					<div class="charicon">
+						<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+					</div>
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -162,7 +183,52 @@
 		properties: {
 			item: Object,
 			maxval: Number,
-			maxrow: Number
+			maxrow: Number,
+			characters: Array
+		},
+		store: function(e){
+			var startState = null;
+			var endState = null;
+			if (this.item.location.name === "Vault") {
+				startState = 3;
+			} else if (this.item.isEquipped){
+				startState = 1;
+			} else {
+				startState = 2;
+			}
+
+			if (e.currentTarget.name === "Vault") {
+				endState = 3;
+			} else {
+				endState = 4;
+			}
+
+			DIM.readyItemState(this.item.location.name, e.currentTarget.name);
+			var itemId = this.item.instanceId;
+			var itemHash = this.item.itemHash;
+			// var direction = null;
+			// if (startState > endState) {
+			// 	direction = "left";
+			// } else {
+			// 	direction = "right";
+			// }
+
+			DIM.promiseWhile(function(start, end, direction){
+				console.log(start);
+				var action = DIM.itemState[start][direction]["action"];
+				var id = DIM.itemState[start][direction]["id"];
+				return DIM[action](id, itemId, itemHash);
+			},startState, endState)
+			.then(function(){
+				console.log("done");
+			});
+
+		},
+		equip: function(e){
+			debugger
+		},
+		charIcon: function(character){
+			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
 			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {

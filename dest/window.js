@@ -6375,7 +6375,52 @@ Polymer({
 		properties: {
 			item: Object,
 			maxval: Number,
-			maxrow: Number
+			maxrow: Number,
+			characters: Array
+		},
+		store: function(e){
+			var startState = null;
+			var endState = null;
+			if (this.item.location.name === "Vault") {
+				startState = 3;
+			} else if (this.item.isEquipped){
+				startState = 1;
+			} else {
+				startState = 2;
+			}
+
+			if (e.currentTarget.name === "Vault") {
+				endState = 3;
+			} else {
+				endState = 4;
+			}
+
+			DIM.readyItemState(this.item.location.name, e.currentTarget.name);
+			var itemId = this.item.instanceId;
+			var itemHash = this.item.itemHash;
+			// var direction = null;
+			// if (startState > endState) {
+			// 	direction = "left";
+			// } else {
+			// 	direction = "right";
+			// }
+
+			DIM.promiseWhile(function(start, end, direction){
+				console.log(start);
+				var action = DIM.itemState[start][direction]["action"];
+				var id = DIM.itemState[start][direction]["id"];
+				return DIM[action](id, itemId, itemHash);
+			},startState, endState)
+			.then(function(){
+				console.log("done");
+			});
+
+		},
+		equip: function(e){
+			debugger
+		},
+		charIcon: function(character){
+			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
 			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {
@@ -6484,7 +6529,8 @@ Polymer({
 				observer: "onFilterChange"
 			},
 			displayItems: Array,
-			chartMaxValue: Number
+			chartMaxValue: Number,
+			characters: Array
 		},
 		itemSort: function(a, b){
 			return b.stats.Range - a.stats.Range;
@@ -6545,7 +6591,7 @@ Polymer({
 		properties: {
 			filter: String,
 			normalizedInventory: Object,
-			characters: Object,
+			characters: Array,
 			weaponTypeSelection: String,
 			destinyMembershipType: String,
 			destinyMembershipId: String,
@@ -6562,6 +6608,9 @@ Polymer({
 			var that = this;
 			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
 			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function(cookie){
+				DIM.csrf = cookie.value;
+			});
 
 			Q.all([promiseBungled, promistBungleatk])
 			.then(function(data){
@@ -6599,7 +6648,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "auto-rifle";
+				that.filter = "scout-rifle";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){
@@ -6738,6 +6787,7 @@ Polymer({
 			normalizedItem.instanceId = vaultItem.itemInstanceId;
 			normalizedItem.itemHash = vaultItem.itemHash;
 			normalizedItem.transferStatus = vaultItem.transferStatus;
+			normalizedItem.levelReq = vaultItem.equipRequiredLevel;
 			return normalizedItem;
 		},
 		getStat: function(archetype) {
