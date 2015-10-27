@@ -4,14 +4,16 @@ DIM.apiKey = "17046260b2014770afb509a3e96a1fe2";
 DIM.csrf = null;
 
 DIM.readyItemState = function(myName, destName){
-	DIM.itemState[1].right.id = myName;
-	DIM.itemState[2].left.id = myName;
-	DIM.itemState[2].right.id = myName;
-	DIM.itemState[3].left.id = myName;
-	DIM.itemState[3].right.id = destName;
-	DIM.itemState[4].left.id = destName;
-	DIM.itemState[4].right.id = destName;
-	DIM.itemState[5].left.id = destName;
+	var itemStateCopy = DIM.itemState;
+	itemStateCopy[1].right.id = myName;
+	itemStateCopy[2].left.id = myName;
+	itemStateCopy[2].right.id = myName;
+	itemStateCopy[3].left.id = myName;
+	itemStateCopy[3].right.id = destName;
+	itemStateCopy[4].left.id = destName;
+	itemStateCopy[4].right.id = destName;
+	itemStateCopy[5].left.id = destName;
+	return itemStateCopy;
 };
 
 DIM.promiseWhile = function promiseWhile(body, start, end) {
@@ -45,6 +47,28 @@ DIM.promiseWhile = function promiseWhile(body, start, end) {
 	return done.promise;
 };
 
+DIM.unequip = function(charId, itemId){
+
+};
+
+DIM.equip = function(charId, itemId){
+	var url = "https://www.bungie.net/Platform/Destiny/EquipItem/";
+	var dataHash = {
+		"membershipType": 1,
+    "itemId": itemId,
+    "characterId": charId,
+	};
+	var postReq = qwest.post(url, dataHash, {
+		"dataType": "json",
+		"headers": {
+			"X-API-KEY": DIM.apiKey,
+			"X-CSRF": DIM.csrf
+		}
+	});
+
+	return Q(postReq);
+};
+
 DIM.toVault = function(charId, itemId, itemHash){
 
 	var url = "https://www.bungie.net/Platform/Destiny/TransferItem/";
@@ -56,7 +80,6 @@ DIM.toVault = function(charId, itemId, itemHash){
     "characterId": charId,
     "transferToVault": true
 	};
-	var data = JSON.stringify(dataHash);
 	var postReq = qwest.post(url, dataHash, {
 		"dataType": "json",
 		"headers": {
@@ -80,7 +103,6 @@ DIM.fromVault = function(charId, itemId, itemHash){
     "characterId": charId,
     "transferToVault": false
 	};
-	var data = JSON.stringify(dataHash);
 	var postReq = qwest.post(url, dataHash, {
 		"dataType": "json",
 		"headers": {

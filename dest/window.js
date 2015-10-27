@@ -6398,12 +6398,6 @@ Polymer({
 			DIM.readyItemState(this.item.location.name, e.currentTarget.name);
 			var itemId = this.item.instanceId;
 			var itemHash = this.item.itemHash;
-			// var direction = null;
-			// if (startState > endState) {
-			// 	direction = "left";
-			// } else {
-			// 	direction = "right";
-			// }
 
 			DIM.promiseWhile(function(start, end, direction){
 				console.log(start);
@@ -6417,7 +6411,35 @@ Polymer({
 
 		},
 		equip: function(e){
-			debugger
+			var startState = null;
+			var endState = null;
+			if (this.item.location.name === "Vault") {
+				startState = 3;
+			} else if (this.item.isEquipped){
+				startState = 1;
+			} else {
+				startState = 2;
+			}
+
+			if (e.currentTarget.name === this.item.location.name) {
+				endState = 1;
+			} else {
+				endState = 5;
+			}
+
+			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name);
+			var itemId = this.item.instanceId;
+			var itemHash = this.item.itemHash;
+
+			DIM.promiseWhile(function(start, end, direction){
+				console.log(start);
+				var action = itemState[start][direction]["action"];
+				var id = itemState[start][direction]["id"];
+				return DIM[action](id, itemId, itemHash);
+			},startState, endState)
+			.then(function(){
+				console.log("done");
+			});
 		},
 		charIcon: function(character){
 			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
@@ -6648,7 +6670,7 @@ Polymer({
 				that.buildInventory();
 			})
 			.then(function(){
-				that.filter = "scout-rifle";
+				that.filter = "warlock-chest-armor";
 			},function(err){debugger});
 		},
 		cookieGet: function (url, name){

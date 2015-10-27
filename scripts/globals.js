@@ -53,6 +53,7 @@ DIM.filterMapping["sword"] = ["Sword", "All"];
 DIM.filterMapping["shotgun"] = ["Shotgun", "All"];
 DIM.filterMapping["hunter-artifact"] = ["Artifact", "Hunter"];
 DIM.filterMapping["hunter-helmet"] = ["Helmet", "Hunter"];
+DIM.filterMapping["warlock-chest-armor"] = ["Chest Armor", "Warlock"]
 
 DIM.itemState = {};
 DIM.itemState[1] = {left: {}, right: {
