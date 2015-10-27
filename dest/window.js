@@ -6378,7 +6378,8 @@ Polymer({
 			maxrow: Number,
 			characters: Array
 		},
-		store: function(e){
+		itemAction: function(e, actionType){
+			var that = this;
 			var startState = null;
 			var endState = null;
 			if (this.item.location.name === "Vault") {
@@ -6389,57 +6390,45 @@ Polymer({
 				startState = 2;
 			}
 
-			if (e.currentTarget.name === "Vault") {
-				endState = 3;
-			} else {
-				endState = 4;
-			}
-
-			DIM.readyItemState(this.item.location.name, e.currentTarget.name);
-			var itemId = this.item.instanceId;
-			var itemHash = this.item.itemHash;
-
-			DIM.promiseWhile(function(start, end, direction){
-				console.log(start);
-				var action = DIM.itemState[start][direction]["action"];
-				var id = DIM.itemState[start][direction]["id"];
-				return DIM[action](id, itemId, itemHash);
-			},startState, endState)
-			.then(function(){
-				console.log("done");
-			});
-
-		},
-		equip: function(e){
-			var startState = null;
-			var endState = null;
-			if (this.item.location.name === "Vault") {
-				startState = 3;
-			} else if (this.item.isEquipped){
-				startState = 1;
-			} else {
-				startState = 2;
-			}
-
-			if (e.currentTarget.name === this.item.location.name) {
-				endState = 1;
-			} else {
-				endState = 5;
+			if (actionType === "equip") {
+				if (e.currentTarget.name === this.item.location.name) {
+					endState = 1;
+				} else {
+					endState = 5;
+				}
+			} else if (actionType === "store") {
+				if (e.currentTarget.name === "Vault") {
+					endState = 3;
+				} else if (e.currentTarget.name === this.item.location.name) {
+					endState = 2;
+				} else {
+					endState = 4;
+				}
 			}
 
 			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name);
 			var itemId = this.item.instanceId;
 			var itemHash = this.item.itemHash;
+			var itemBucket = this.item.bucket.bucketHash;
+			var char = _.find(this.characters, function(char){
+				return that.item.location.name === char.characterBase.characterId;
+			});
 
 			DIM.promiseWhile(function(start, end, direction){
 				console.log(start);
 				var action = itemState[start][direction]["action"];
 				var id = itemState[start][direction]["id"];
-				return DIM[action](id, itemId, itemHash);
+				return DIM[action](id, itemId, itemHash, itemBucket, char);
 			},startState, endState)
 			.then(function(){
 				console.log("done");
 			});
+		},
+		store: function(e){
+			this.itemAction(e, "store");
+		},
+		equip: function(e){
+			this.itemAction(e, "equip");
 		},
 		charIcon: function(character){
 			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
@@ -6664,6 +6653,7 @@ Polymer({
 					var res = JSON.parse(charXhr.response);
 					var charInv = res.Response.data;
 					charInv.characterId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
+					DIM.charactersInv.push(charInv);
 					return charInv;
 				});
 				console.log("char ready");
@@ -6785,7 +6775,12 @@ Polymer({
 			} else {
 				className = artifactClass[1];
 			}
+			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
+			normalizedItem.bucket = {};
+			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
+			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;
+			console.log(DIM.buckets[archetype.bucketTypeHash].bucketName);
 			normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 			normalizedItem.stats = this.getStat(vaultItem);
 			var baseStat = this.getStat(archetype);

@@ -68,6 +68,7 @@
 					var res = JSON.parse(charXhr.response);
 					var charInv = res.Response.data;
 					charInv.characterId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
+					DIM.charactersInv.push(charInv);
 					return charInv;
 				});
 				console.log("char ready");
@@ -189,7 +190,12 @@
 			} else {
 				className = artifactClass[1];
 			}
+			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
+			normalizedItem.bucket = {};
+			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
+			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;
+			console.log(DIM.buckets[archetype.bucketTypeHash].bucketName);
 			normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 			normalizedItem.stats = this.getStat(vaultItem);
 			var baseStat = this.getStat(archetype);

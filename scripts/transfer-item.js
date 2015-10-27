@@ -47,7 +47,15 @@ DIM.promiseWhile = function promiseWhile(body, start, end) {
 	return done.promise;
 };
 
-DIM.unequip = function(charId, itemId){
+DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
+
+	var guy = _.find(DIM.charactersInv, function(guy){
+		return guy.characterId === charId;
+	});
+	var bucket = _.find(guy.buckets.Equippable, function(bucket){
+		return bucket.bucketHash === itemBucket;
+	});
+	debugger
 
 };
 

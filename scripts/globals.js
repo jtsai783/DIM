@@ -28,7 +28,7 @@ qwest.get('../api-manifest/stats.json')
 
 DIM.inventory = {};
 
-DIM.characters = null;
+DIM.charactersInv = [];
 
 DIM.ignoredStats = ["Inventory Size", "Light"];
 
