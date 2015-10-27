@@ -2,6 +2,10 @@
 
 var DIM = DIM || {};
 
+DIM.apiKey = "17046260b2014770afb509a3e96a1fe2";
+DIM.csrf = null;
+DIM.temp = {};
+
 qwest.get('../api-manifest/items.json')
 .then(function(xhr, res){
 	DIM.items = JSON.parse(res);
@@ -26,9 +30,7 @@ qwest.get('../api-manifest/stats.json')
 	console.log("stats ready");
 });
 
-DIM.inventory = {};
-
-DIM.charactersInv = [];
+DIM.inventory = [];
 
 DIM.ignoredStats = ["Inventory Size", "Light"];
 
@@ -38,22 +40,6 @@ DIM.damageType[1] = "Kinetic";
 DIM.damageType[2] = "Arc";
 DIM.damageType[3] = "Solar";
 DIM.damageType[4] = "Void";
-
-DIM.inventoryFilter = [
-	"Shader", "Engram", "Subclass", "Vehicle", "Ship", "Material", "Consum",
-	"Emblem", "Emote", "Default"
-];
-
-DIM.filterMapping = {};
-DIM.filterMapping["scout-rifle"] = ["Scout Rifle", "All"];
-DIM.filterMapping["auto-rifle"] = ["Auto Rifle", "All"];
-DIM.filterMapping["hunter-class-armor"] = ["Class Armor", "Hunter"];
-DIM.filterMapping["fusion-rifle"] = ["Fusion Rifle", "All"];
-DIM.filterMapping["sword"] = ["Sword", "All"];
-DIM.filterMapping["shotgun"] = ["Shotgun", "All"];
-DIM.filterMapping["hunter-artifact"] = ["Artifact", "Hunter"];
-DIM.filterMapping["hunter-helmet"] = ["Helmet", "Hunter"];
-DIM.filterMapping["warlock-chest-armor"] = ["Chest Armor", "Warlock"]
 
 DIM.itemState = {};
 DIM.itemState[1] = {left: {}, right: {

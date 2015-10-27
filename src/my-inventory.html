@@ -4,7 +4,7 @@
 <dom-module id="my-inventory">
 
 	<template>
-		<template is="dom-repeat" items="{{displayItems}}"  sort="itemSort">
+		<template is="dom-repeat" items="{{displayitems}}">
 			<item-card
 				item="{{item}}" 
 				maxval="{{chartMaxValue}}"
@@ -19,30 +19,48 @@
 	Polymer({
 		is: "my-inventory",
 		properties: {
-			filter: {
-				type: String,
-				observer: "onFilterChange"
+			displayitems: {
+				type: Array,
+				observer: "onItemsChange"
 			},
-			displayItems: Array,
 			chartMaxValue: Number,
-			characters: Array
+			allitems: Array,
+			classes: {
+				type: Array,
+				value: []
+			},
+			slots: {
+				type: Array,
+				value: []
+			},
+			itemready: {
+				type: Boolean,
+				observer: "invReady"
+			}
+		},
+		invReady: function(){
+			_.each(DIM.inventory, function(item){
+				if(!_.contains(this.classes, item.klass)){
+					this.classes.push(item.klass);
+				}
+				if(!_.contains(this.slots, item.bucket.bucketName)){
+					this.slots.push(item.bucket.bucketName);
+				}
+			}, this);
 		},
 		itemSort: function(a, b){
 			return b.stats.Range - a.stats.Range;
 		},
-		onFilterChange: function(newVal, oldVal){
-			var mapping = DIM.filterMapping[newVal];
-			var items = DIM.inventory;
-			_.each(mapping, function(el, index){
-				items = items[el];
-			});
-			this.displayItems = items;
+		itemFilter: function(item){
+			return item.bucket.bucketName === "Leg Armor";
+		},
+		onItemsChange: function(){
 			this.getChartMaxValue();
 			this.padPerkGrid();
 		},
 		getChartMaxValue: function(){
 			var maxVal = 0;
-			_.each(this.displayItems, function(item){
+			_.each(this.displayitems, function(item){
 				var statVal = _.values(item.baseStat)
 											.concat(_.values(item.hiddenStats))
 											.concat(_.values(item.stats));
@@ -55,7 +73,7 @@
 		},
 		padPerkGrid: function(){
 			var maxVal = 0;
-			_.each(this.displayItems, function(item){
+			_.each(this.displayitems, function(item){
 				if(item.talentGrid.length > maxVal){
 					maxVal = item.talentGrid.length;
 				}
@@ -64,7 +82,7 @@
 			var padding = {
 				padding: true
 			};
-			this.displayItems = _.map(this.displayItems, function(item){
+			this.displayitems = _.map(this.displayitems, function(item){
 				if(item.talentGrid.length < maxVal){
 					var diff = maxVal - item.talentGrid.length;
 					for (i = 0; i < diff; i++) { 

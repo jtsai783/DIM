@@ -6448,7 +6448,7 @@ Polymer({
 			}
 		},
 		locationIcon: function(item){
-			if (item.location.name === "Vault"){
+			if (item.location.location === 2){
 				return item.location.icon;
 			} else {
 				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
@@ -6535,30 +6535,48 @@ Polymer({
 Polymer({
 		is: "my-inventory",
 		properties: {
-			filter: {
-				type: String,
-				observer: "onFilterChange"
+			displayitems: {
+				type: Array,
+				observer: "onItemsChange"
 			},
-			displayItems: Array,
 			chartMaxValue: Number,
-			characters: Array
+			allitems: Array,
+			classes: {
+				type: Array,
+				value: []
+			},
+			slots: {
+				type: Array,
+				value: []
+			},
+			itemready: {
+				type: Boolean,
+				observer: "invReady"
+			}
+		},
+		invReady: function(){
+			_.each(DIM.inventory, function(item){
+				if(!_.contains(this.classes, item.klass)){
+					this.classes.push(item.klass);
+				}
+				if(!_.contains(this.slots, item.bucket.bucketName)){
+					this.slots.push(item.bucket.bucketName);
+				}
+			}, this);
 		},
 		itemSort: function(a, b){
 			return b.stats.Range - a.stats.Range;
 		},
-		onFilterChange: function(newVal, oldVal){
-			var mapping = DIM.filterMapping[newVal];
-			var items = DIM.inventory;
-			_.each(mapping, function(el, index){
-				items = items[el];
-			});
-			this.displayItems = items;
+		itemFilter: function(item){
+			return item.bucket.bucketName === "Leg Armor";
+		},
+		onItemsChange: function(){
 			this.getChartMaxValue();
 			this.padPerkGrid();
 		},
 		getChartMaxValue: function(){
 			var maxVal = 0;
-			_.each(this.displayItems, function(item){
+			_.each(this.displayitems, function(item){
 				var statVal = _.values(item.baseStat)
 											.concat(_.values(item.hiddenStats))
 											.concat(_.values(item.stats));
@@ -6571,7 +6589,7 @@ Polymer({
 		},
 		padPerkGrid: function(){
 			var maxVal = 0;
-			_.each(this.displayItems, function(item){
+			_.each(this.displayitems, function(item){
 				if(item.talentGrid.length > maxVal){
 					maxVal = item.talentGrid.length;
 				}
@@ -6580,7 +6598,7 @@ Polymer({
 			var padding = {
 				padding: true
 			};
-			this.displayItems = _.map(this.displayItems, function(item){
+			this.displayitems = _.map(this.displayitems, function(item){
 				if(item.talentGrid.length < maxVal){
 					var diff = maxVal - item.talentGrid.length;
 					for (i = 0; i < diff; i++) { 
@@ -6600,68 +6618,69 @@ Polymer({
 Polymer({
 		is: "dim-app",
 		properties: {
-			filter: String,
-			normalizedInventory: Object,
-			characters: Array,
-			weaponTypeSelection: String,
-			destinyMembershipType: String,
 			destinyMembershipId: String,
 			membershipType: String,
-			loginStatus: String,
-			charInv: Object,
-			vaultInv: Object,
-			apiKey: {
-				type: String,
-				value: "17046260b2014770afb509a3e96a1fe2"
-			}
+			destinyMembershipType: String,
+			characters: Array,
+			itemready: Boolean,
 		},
 		ready: function(){
 			var that = this;
-			promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
-			promistBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
-			chrome.cookies.get({"url": "https://www.bungie.net", "name": "bungled"}, function(cookie){
-				DIM.csrf = cookie.value;
-			});
 
-			Q.all([promiseBungled, promistBungleatk])
-			.then(function(data){
-				return Q(qwest.get("https://www.bungie.net/en/profile"));
-			})
-			.then(function(xhr){
-				var id = /destinyMembershipId: "(.*)"/;
-				var type = /membershipType: "(.*)"/;
-				var dType = /destinyMembershipType: "(.*)"/;
-				that.destinyMembershipId = xhr.response.match(id)[1];
-				that.membershipType = xhr.response.match(type)[1];
-				that.destinyMembershipType = xhr.response.match(dType)[1];
-				var vaultInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/";
-				return Q(qwest.get(vaultInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
-			}, function(){
-				that.loginStatus = "NOT LOGGED IN";
-			})
-			.then(function(xhr){
-				that.vaultInv = JSON.parse(xhr.response).Response.data;
-				that.characters = that.vaultInv.characters;
-				console.log("vault ready");
-				var charGetArr = that.buildCharPromises(that.characters);
-				return Q.all(charGetArr);
-			}, function() {
-				// debugger
-			})
-			.then(function(data){
-				that.charInv = _.map(data, function(charXhr){
-					var res = JSON.parse(charXhr.response);
-					var charInv = res.Response.data;
-					charInv.characterId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
-					DIM.charactersInv.push(charInv);
-					return charInv;
-				});
-				console.log("char ready");
-				that.buildInventory();
-			})
+			var promiseBungled = this.cookieGet("https://www.bungie.net", "bungled");
+			var promiseBungleatk = this.cookieGet("https://www.bungie.net", "bungleatk");
+			Q.all([promiseBungled, promiseBungleatk])
+			.then(this.checkLoginGetProfile.bind(this))
+			.then(this.parseProfileGetVaultInfo.bind(this))
+			.then(this.parseVaultGetChars.bind(this))
+			.then(this.parseChar.bind(this))
 			.then(function(){
-				that.filter = "warlock-chest-armor";
+				that.itemready = true;
 			},function(err){debugger});
+		},
+		parseChar: function(data){
+			_.each(data, function(charXhr){
+				var res = JSON.parse(charXhr.response);
+				var charInv = res.Response.data;
+				DIM.temp.charId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
+				DIM.temp.guy = _.find(this.characters, function(character){
+					return character.characterBase.characterId === DIM.temp.charId;
+				});
+				_.each(charInv.buckets.Equippable, function(bucket){
+					_.each(bucket.items, function(item){
+						DIM.inventory.push(this.normalizeItem(item, DIM.temp.guy));
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+			console.log("char ready");
+		},
+		parseVaultGetChars: function(xhr){
+			var vaultInv = JSON.parse(xhr.response).Response.data;
+			_.each(vaultInv.inventory.buckets.Item, function(bucket){
+				_.each(bucket.items, function(item){
+					DIM.inventory.push(this.normalizeItem(item));
+				}.bind(this));
+			}.bind(this));
+			this.characters = vaultInv.characters;
+			console.log("vault ready");
+			var charGetArr = this.buildCharPromises.bind(this, this.characters)();
+			return Q.all(charGetArr);
+		},
+		parseProfileGetVaultInfo:function(xhr){
+			this.destinyMembershipId = xhr.response.match(/destinyMembershipId: "(.*)"/)[1];
+			this.membershipType = xhr.response.match(/membershipType: "(.*)"/)[1];
+			this.destinyMembershipType = xhr.response.match(/destinyMembershipType: "(.*)"/)[1];
+			var vaultInvUrl = "https://www.bungie.net/Platform/Destiny/" + this.destinyMembershipType + "/Account/" + this.destinyMembershipId + "/";
+			return Q(qwest.get(vaultInvUrl, null, {
+				"headers": {
+					"X-API-KEY": DIM.apiKey
+				}
+			}));
+		},
+		checkLoginGetProfile: function(data){
+			//throw error here if i dont have both cookie
+			DIM.csrf = data[0].value;
+			return Q(qwest.get("https://www.bungie.net/en/profile"));
 		},
 		cookieGet: function (url, name){
 			var deferred = Q.defer();
@@ -6674,113 +6693,31 @@ Polymer({
 			var that = this;
 			return _.map(characters, function(character) {
 				var charInvUrl = "https://www.bungie.net/Platform/Destiny/" + that.destinyMembershipType + "/Account/" + that.destinyMembershipId + "/Character/" + character.characterBase.characterId + "/Inventory/?definitions=false";
-				return Q(qwest.get(charInvUrl, null, {"headers": {"X-API-KEY": that.apiKey}}));
-			});
-		},
-		buildInventory: function() {
-			this.buildFromVault();
-			this.buildFromChars();
-			this.filterInventory();
-		},
-		filterInventory: function() {
-			DIM.inventory = _.omit(DIM.inventory, function(val, key, obj){
-				return _.some(DIM.inventoryFilter, function(keyword){
-					return key.includes(keyword);
-				});
+				return Q(qwest.get(charInvUrl, null, {"headers": {"X-API-KEY": DIM.apiKey}}));
 			});
 		},
 		lookUpTypeName: function(hash){
 			return DIM.items[hash].itemTypeName;
 		},
-		buildFromChars: function(){
-			var that = this;
-			
-			_.each(this.charInv, function(inv){
-				var character = _.find(that.characters, function(character){
-					return character.characterBase.characterId === inv.characterId;
-				});
-				that.buildFromBuckets(inv, {name: inv.characterId, icon: character.emblemPath});
-			});
-		},
-		buildFromVault: function(){
-			var that = this;
-			this.buildFromBuckets(this.vaultInv.inventory, {name: "Vault", icon: "../myicons/vault.png"});
-		},
-		buildFromBuckets: function(inv, location){
-			var that = this;
-			var buckets = null;
-			if (location.name === "Vault"){
-				buckets = inv.buckets.Item;
-			} else {
-				buckets = inv.buckets.Equippable;
-			}
-			_.each(buckets, function(bucket) {
-				DIM.bucketName = DIM.buckets[bucket.bucketHash].bucketName;
-				_.each(bucket.items, function(item) {
-					var categoryName = that.lookUpTypeName(item.itemHash);
-					var itemClass = DIM.items[item.itemHash].classType;
-					var combinedName = "" + categoryName + " " + itemClass;
-					if (categoryName.includes("Artifact")){
-						var splitName = categoryName.split(" ");
-						itemClass = splitName[0];
-						categoryName = splitName[1];
-					}
-					if (categoryName.includes("Bond") || categoryName.includes("Cloak") || categoryName.includes("Mark")){
-						categoryName = "Class Armor";
-					}
-					if (typeof DIM.inventory[categoryName] === "undefined"){
-						DIM.inventory[categoryName] = {};
-					}
-					if (categoryName !== "Artifact"){
-						switch(itemClass){
-							case 0:
-								itemClass = "Titan";
-								break;
-							case 1:
-								itemClass = "Hunter";
-								break;
-							case 2:
-								itemClass = "Warlock";
-								break;
-							case 3:
-								itemClass = "All";
-						}
-					}
-					if (categoryName === "Armsday Order"){
-						itemClass = DIM.bucketName;
-					}
-					if (typeof DIM.inventory[categoryName][itemClass] === "undefined"){
-						DIM.inventory[categoryName][itemClass] = [];
-					}
-					DIM.inventory[categoryName][itemClass].push(that.normalizeItem(item, location));
-				});
-			});
-		},
-		normalizeItem: function(vaultItem, location) {
+		normalizeItem: function(vaultItem, char) {
 			var archetype = DIM.items[vaultItem.itemHash];
 			var normalizedItem = {};
 			var classType = archetype.classType;
 			var className = "";
-			var artifactClass = archetype.itemTypeName.match(/(.*) Artifact/);
-			if (artifactClass === null) {
-				if (classType === 0){
-					className = "Titan";
-				} else if (classType === 1) {
-					className = "Hunter";
-				} else if (classType === 2) {
-					className = "Warlock";
-				} else if (classType === 3) {
-					className = "All";
-				}
-			} else {
-				className = artifactClass[1];
+			if (classType === 0){
+				className = "Titan";
+			} else if (classType === 1) {
+				className = "Hunter";
+			} else if (classType === 2) {
+				className = "Warlock";
+			} else if (classType === 3) {
+				className = "All";
 			}
 			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
 			normalizedItem.bucket = {};
 			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
 			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;
-			console.log(DIM.buckets[archetype.bucketTypeHash].bucketName);
 			normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 			normalizedItem.stats = this.getStat(vaultItem);
 			var baseStat = this.getStat(archetype);
@@ -6797,6 +6734,22 @@ Polymer({
 			}
 			normalizedItem.hiddenStats = hStat;
 			normalizedItem.name = DIM.items[vaultItem.itemHash].itemName;
+			
+			var locationIcon, locName;
+			if (vaultItem.location === 2) {
+				locationIcon = "../myicons/vault.png";
+				locName = "Vault";
+			} else {
+				locationIcon = char.emblemPath;
+				locName = char.characterBase.characterId;
+			}
+
+			var location = {
+				location: vaultItem.location,
+				name: locName,
+				icon: locationIcon
+			};
+			
 			normalizedItem.location = location;
 			normalizedItem.talentGrid = this.getTalent(vaultItem);
 			normalizedItem.isEquipped = vaultItem.isEquipped;
@@ -6824,7 +6777,7 @@ Polymer({
 				_.each(baseGridNodes, function(node){
 					if (node.row >= 0 && node.column >= 0){
 						var currentItemNode = _.find(itemNodes, function(itemNode){
-							return itemNode.nodeHash === node.nodeHash;
+							return itemNode.nodeHash === node.nodeIndex;
 						});
 						var step = node.steps[currentItemNode.stepIndex];
 						var nodeObj = {};

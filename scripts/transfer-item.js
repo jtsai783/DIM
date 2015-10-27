@@ -1,8 +1,5 @@
 var DIM = DIM || {};
 
-DIM.apiKey = "17046260b2014770afb509a3e96a1fe2";
-DIM.csrf = null;
-
 DIM.readyItemState = function(myName, destName){
 	var itemStateCopy = DIM.itemState;
 	itemStateCopy[1].right.id = myName;
@@ -16,7 +13,7 @@ DIM.readyItemState = function(myName, destName){
 	return itemStateCopy;
 };
 
-DIM.promiseWhile = function promiseWhile(body, start, end) {
+DIM.promiseWhile = function(body, start, end) {
 	var done = Q.defer();
 	var direction = null;
 	var inc = null;
@@ -29,21 +26,12 @@ DIM.promiseWhile = function promiseWhile(body, start, end) {
 	}
 
 	function loop(start, end) {
-	    // When the result of calling `condition` is no longer true, we are
-	    // done.
-	    if (start === end) return done.resolve();
-	    // Use `when`, in case `body` does not return a promise.
-	    // When it completes loop again otherwise, if it fails, reject the
-	    // done promise
-	    Q.when(body(start, end, direction), loop(start + inc, end), done.reject);
+    if (start === end) return done.resolve();
+    Q.when(body(start, end, direction), loop(start + inc, end), done.reject);
 	}
 
-	// Start running the loop in the next tick so that this function is
-	// completely async. It would be unexpected if `body` was called
-	// synchronously the first time.
 	setTimeout(loop, 0, start, end);
 
-	// The promise
 	return done.promise;
 };
 

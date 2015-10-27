@@ -256,7 +256,7 @@
 	</dom-module><dom-module id="my-inventory" assetpath="/">
 
 	<template>
-		<template is="dom-repeat" items="{{displayItems}}" sort="itemSort">
+		<template is="dom-repeat" items="{{displayitems}}">
 			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="" "{{gridmaxrow}}"="" characters="{{characters}}">
 			</item-card>
     </template>
@@ -277,8 +277,7 @@
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
-		<my-inventory filter="{{filter}}" characters="{{characters}}">
-		</my-inventory>
+		<my-inventory itemready="{{itemready}}"></my-inventory>
 	</template>
 
 	</dom-module></div>
