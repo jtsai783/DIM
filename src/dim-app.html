@@ -35,15 +35,15 @@
 			_.each(data, function(charXhr){
 				var res = JSON.parse(charXhr.response);
 				var charInv = res.Response.data;
-				DIM.temp.charId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
-				DIM.temp.guy = _.find(this.characters, function(character){
-					return character.characterBase.characterId === DIM.temp.charId;
+				var charId = charXhr.responseURL.match(/Character\/(.*)\/Inventory/)[1];
+				var guy = _.find(this.characters, function(character){
+					return character.characterBase.characterId === charId;
 				});
-				_.each(charInv.buckets.Equippable, function(bucket){
+				_.each(charInv.buckets.Equippable,function(bucket){
 					_.each(bucket.items, function(item){
-						DIM.inventory.push(this.normalizeItem(item, DIM.temp.guy));
+						DIM.inventory.push(this.normalizeItem(item, guy));
 					}.bind(this));
-				}.bind(this));
+				}.bind(this)) ;
 			}.bind(this));
 			console.log("char ready");
 		},
@@ -97,15 +97,21 @@
 			var normalizedItem = {};
 			var classType = archetype.classType;
 			var className = "";
-			if (classType === 0){
-				className = "Titan";
-			} else if (classType === 1) {
-				className = "Hunter";
-			} else if (classType === 2) {
-				className = "Warlock";
-			} else if (classType === 3) {
-				className = "All";
+
+			if (archetype.itemTypeName.match(/(.*) Artifact/) !== null){
+				className = archetype.itemTypeName.match(/(.*) Artifact/)[1];
+			} else {
+				if (classType === 0){
+					className = "Titan";
+				} else if (classType === 1) {
+					className = "Hunter";
+				} else if (classType === 2) {
+					className = "Warlock";
+				} else if (classType === 3) {
+					className = "All";
+				}
 			}
+		
 			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
 			normalizedItem.bucket = {};

@@ -4,7 +4,6 @@ var DIM = DIM || {};
 
 DIM.apiKey = "17046260b2014770afb509a3e96a1fe2";
 DIM.csrf = null;
-DIM.temp = {};
 
 qwest.get('../api-manifest/items.json')
 .then(function(xhr, res){

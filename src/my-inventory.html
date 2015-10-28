@@ -5,7 +5,7 @@
 <dom-module id="my-inventory">
 
 	<template>
-		<item-filter klass="{{classes}}" slots="{{slots}}"></item-filter>
+		<item-filter klass="{{classes}}"></item-filter>
 		<template is="dom-repeat" items="{{displayitems}}">
 			<item-card
 				item="{{item}}" 
@@ -43,10 +43,7 @@
 		invReady: function(){
 			_.each(DIM.inventory, function(item){
 				if(!_.contains(this.classes, item.klass)){
-					this.classes.push(item.klass);
-				}
-				if(!_.contains(this.slots, item.bucket.bucketName)){
-					this.slots.push(item.bucket.bucketName);
+					this.push("classes", item.klass);
 				}
 			}, this);
 		},

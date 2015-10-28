@@ -1,33 +1,137 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
 <dom-module id="item-filter">
 
 	<template>
 		<style>
-			div {
-				background: white;
-				width: 100%;
-				height: 50px;
-			}
+
 		</style>
-		<div>lolololo</div>
-<!-- 		<template is="dom-repeat" items="{{classes}}">
-			<div>test</div>
-		</template> -->
+
+		<paper-dropdown-menu label="Class" value="{{classselect}}">
+		  <paper-menu class="dropdown-content" selected="0">
+		    <template is="dom-repeat" items="{{klass}}">
+		    	<paper-item>{{item}}</paper-item>
+		    </template>
+		  </paper-menu>
+		</paper-dropdown-menu>
+
+		<paper-dropdown-menu label="Equipment Slot" value="{{slotselect}}">
+		  <paper-menu id="slotmenu" class="dropdown-content">
+		    <template is="dom-repeat" items="{{slots}}">
+		    	<paper-item>{{item}}</paper-item>
+		    </template>
+		  </paper-menu>
+		</paper-dropdown-menu>
+
+		<paper-dropdown-menu label="Item Type" value="{{typeselect}}">
+		  <paper-menu id="typemenu" class="dropdown-content">
+		    <template is="dom-repeat" items="{{types}}">
+		    	<paper-item>{{item}}</paper-item>
+		    </template>
+		  </paper-menu>
+		</paper-dropdown-menu>
 	</template>
 
 	<script>
 		Polymer({
 			is: "item-filter",
 			properties: {
-				klass: {
+				klass: Array,
+				slots: {
 					type: Array,
-					observer: "test"
+					value: []
 				},
-				slots: Array
+				types: {
+					type: Array,
+					value: []
+				},
+				classselect: {
+					type: String,
+					value: "",
+					observer: "classSelectChanged"
+				},
+				slotselect: {
+					type: String,
+					value: "",
+					observer: "slotSelectChanged"
+				},
+				typeselect: {
+					type: String,
+					observer: "typeSelectChanged"
+				}
 			},
-			test: function(){
-				console.log(this.klass);
+			classSelectChanged: function(val){
+				if (this.classselect !== ""){
+					this.generateSlots();	
+				}
+			},
+			slotSelectChanged: function(val){
+				if (this.slotselect !== ""){
+					this.generateTypes();
+				}
+			},
+			typeSelectChanged: function(){
+				if (this.typeselect !== ""){
+					console.log("" + this.classselect + " " + this.slotselect + " " + this.typeselect);	
+				}
+			},
+			itemFilter: function(item){
+				var fSlot = ["Ships", "Consum", "Embl", "Emote", "Mater", "Shade", "Vehi", "Subclass"];
+				var fType = ["Engram", "Armsday"];
+				var pass = true;
+				_.each(fSlot, function(slotname){
+					if (item.bucket.bucketName.includes(slotname)){
+						pass = false;
+					}
+				});
+
+				_.each(fType, function(typename){
+					if (item.typeName.includes(typename)){
+						pass = false;
+					}
+				});
+				return pass;
+			},
+			generateSlots: function(){
+				var menu = this.$.slotmenu;
+				this.slots = [];
+				var filteredItems = _.filter(DIM.inventory, function(item){
+					return item.klass === this.classselect && this.itemFilter(item);
+				}, this);
+				_.each(filteredItems, function(item){
+					if (!_.contains(this.slots, item.bucket.bucketName)){
+						this.push("slots", item.bucket.bucketName);
+					}
+				}, this);
+				this.slots = this.slots.sort();
+				this.async(function(){
+					menu.select("1");
+					menu.select("0");
+				});
+			},
+			generateTypes: function(){
+				// this.splice("types", 0, this.splice.length);
+				var menu = this.$.typemenu;
+				this.types = [];
+				var filteredItems = _.filter(DIM.inventory, function(item){
+					return item.klass === this.classselect && item.bucket.bucketName === this.slotselect && this.itemFilter(item);
+				}, this);
+				// debugger
+				_.each(filteredItems, function(item){
+					if (!_.contains(this.types, item.typeName)){
+						this.push("types", item.typeName);
+					}
+				}, this);
+				this.types = this.types.sort();
+				this.async(function(){
+					menu.select("1");
+					menu.select("0");
+				});
+				
 			}
 		});
 	</script>
