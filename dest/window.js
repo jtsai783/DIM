@@ -6533,6 +6533,19 @@ Polymer({
 		}
 	});
 Polymer({
+			is: "item-filter",
+			properties: {
+				klass: {
+					type: Array,
+					observer: "test"
+				},
+				slots: Array
+			},
+			test: function(){
+				console.log(this.klass);
+			}
+		});
+Polymer({
 		is: "my-inventory",
 		properties: {
 			displayitems: {
@@ -6609,12 +6622,6 @@ Polymer({
 			});
 		}
 	});
-Polymer({
-			is: "item-filter",
-			properties: {
-				categories: Object
-			}
-		});
 Polymer({
 		is: "dim-app",
 		properties: {

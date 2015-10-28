@@ -5,19 +5,29 @@
 	<template>
 		<style>
 			div {
-				background: black;
+				background: white;
 				width: 100%;
 				height: 50px;
 			}
 		</style>
-		<div>test</div>
+		<div>lolololo</div>
+<!-- 		<template is="dom-repeat" items="{{classes}}">
+			<div>test</div>
+		</template> -->
 	</template>
 
 	<script>
 		Polymer({
 			is: "item-filter",
 			properties: {
-				categories: Object
+				klass: {
+					type: Array,
+					observer: "test"
+				},
+				slots: Array
+			},
+			test: function(){
+				console.log(this.klass);
 			}
 		});
 	</script>

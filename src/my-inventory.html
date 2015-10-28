@@ -1,9 +1,11 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="item-card.html">
+<link rel="import" href="item-filter.html">
 
 <dom-module id="my-inventory">
 
 	<template>
+		<item-filter klass="{{classes}}" slots="{{slots}}"></item-filter>
 		<template is="dom-repeat" items="{{displayitems}}">
 			<item-card
 				item="{{item}}" 
