@@ -165,7 +165,7 @@
 									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
 								</template>
 								<template is="dom-if" if="{{talentcell.padding}}">
-									<img class="talent-image" src="../icons/empty.png">
+									<img class="talent-image" src="../myicons/empty.png">
 								</template>
 							</div>
 						</template>
@@ -273,6 +273,9 @@
 			return talentcell.name + "\n" + talentcell.description;
 		},
 		perkIcon:function(iconName){
+			if (typeof iconName === "undefined"){
+				// debugger
+			}
 			return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 		},
 		primaryStat: function(stat){

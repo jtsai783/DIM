@@ -8,7 +8,9 @@
 
 	<template>
 		<style>
-
+		:host {
+			display: block;
+		}
 		</style>
 
 		<paper-dropdown-menu label="Class" value="{{classselect}}">
@@ -62,6 +64,10 @@
 				typeselect: {
 					type: String,
 					observer: "typeSelectChanged"
+				},
+				filters: {
+					type: Object,
+					notify: true
 				}
 			},
 			classSelectChanged: function(val){
@@ -76,7 +82,11 @@
 			},
 			typeSelectChanged: function(){
 				if (this.typeselect !== ""){
-					console.log("" + this.classselect + " " + this.slotselect + " " + this.typeselect);	
+					this.filters = {
+						klass: this.classselect,
+						slot: this.slotselect,
+						type: this.typeselect
+					};
 				}
 			},
 			itemFilter: function(item){

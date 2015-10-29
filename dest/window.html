@@ -2398,7 +2398,7 @@ respectively.
 									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
 								</template>
 								<template is="dom-if" if="{{talentcell.padding}}">
-									<img class="talent-image" src="../icons/empty.png">
+									<img class="talent-image" src="../myicons/empty.png">
 								</template>
 							</div>
 						</template>
@@ -3401,7 +3401,9 @@ respectively.
 
 	<template>
 		<style>
-
+		:host {
+			display: block;
+		}
 		</style>
 
 		<paper-dropdown-menu label="Class" value="{{classselect}}">
@@ -3432,9 +3434,9 @@ respectively.
 	</dom-module><dom-module id="my-inventory" assetpath="/">
 
 	<template>
-		<item-filter klass="{{classes}}"></item-filter>
+		<item-filter klass="{{classes}}" filters="{{filters}}"></item-filter>
 		<template is="dom-repeat" items="{{displayitems}}">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="" "{{gridmaxrow}}"="" characters="{{characters}}">
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="{{gridMaxRow}}" characters="{{characters}}">
 			</item-card>
     </template>
 	</template>

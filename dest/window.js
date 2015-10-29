@@ -11444,6 +11444,9 @@ Polymer({
 			return talentcell.name + "\n" + talentcell.description;
 		},
 		perkIcon:function(iconName){
+			if (typeof iconName === "undefined"){
+				// debugger
+			}
 			return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 		},
 		primaryStat: function(stat){
@@ -13582,6 +13585,10 @@ Polymer({
 				typeselect: {
 					type: String,
 					observer: "typeSelectChanged"
+				},
+				filters: {
+					type: Object,
+					notify: true
 				}
 			},
 			classSelectChanged: function(val){
@@ -13596,7 +13603,11 @@ Polymer({
 			},
 			typeSelectChanged: function(){
 				if (this.typeselect !== ""){
-					console.log("" + this.classselect + " " + this.slotselect + " " + this.typeselect);	
+					this.filters = {
+						klass: this.classselect,
+						slot: this.slotselect,
+						type: this.typeselect
+					};
 				}
 			},
 			itemFilter: function(item){
@@ -13659,7 +13670,7 @@ Polymer({
 		properties: {
 			displayitems: {
 				type: Array,
-				observer: "onItemsChange"
+				value: []
 			},
 			chartMaxValue: Number,
 			allitems: Array,
@@ -13674,7 +13685,27 @@ Polymer({
 			itemready: {
 				type: Boolean,
 				observer: "invReady"
+			},
+			filters: {
+				type: Object,
+				observer: "filterChanged"
 			}
+		},
+		filterChanged: function(filter){
+			var temp = [];
+			// debugger
+			_.each(DIM.inventory, function(item){
+				if (item.klass === filter.klass && item.bucket.bucketName === filter.slot && item.typeName === filter.type) {
+					temp.push(item);
+				}
+			}, this);
+			this.displayitems = [];
+			setTimeout(function(){
+				this.displayitems = temp;
+				this.getChartMaxValue();
+				this.padPerkGrid();
+			}.bind(this), 1000);
+
 		},
 		invReady: function(){
 			_.each(DIM.inventory, function(item){
@@ -13688,10 +13719,6 @@ Polymer({
 		},
 		itemFilter: function(item){
 			return item.bucket.bucketName === "Leg Armor";
-		},
-		onItemsChange: function(){
-			this.getChartMaxValue();
-			this.padPerkGrid();
 		},
 		getChartMaxValue: function(){
 			var maxVal = 0;
