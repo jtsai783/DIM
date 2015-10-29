@@ -21,6 +21,7 @@
 	Polymer({
 		is: "my-inventory",
 		properties: {
+			characters: Array,
 			displayitems: {
 				type: Array,
 				value: []
@@ -57,7 +58,7 @@
 				this.displayitems = temp;
 				this.getChartMaxValue();
 				this.padPerkGrid();
-			}.bind(this), 1000);
+			}.bind(this), 0);
 
 		},
 		invReady: function(){

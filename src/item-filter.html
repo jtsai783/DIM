@@ -10,7 +10,10 @@
 		<style>
 		:host {
 			display: block;
+			background-color: rgb(188,188,188);
+			padding-left: 20px;
 		}
+
 		</style>
 
 		<paper-dropdown-menu label="Class" value="{{classselect}}">
@@ -22,7 +25,7 @@
 		</paper-dropdown-menu>
 
 		<paper-dropdown-menu label="Equipment Slot" value="{{slotselect}}">
-		  <paper-menu id="slotmenu" class="dropdown-content">
+		  <paper-menu id="slotmenu" class="dropdown-content" selected="0">
 		    <template is="dom-repeat" items="{{slots}}">
 		    	<paper-item>{{item}}</paper-item>
 		    </template>
@@ -30,7 +33,7 @@
 		</paper-dropdown-menu>
 
 		<paper-dropdown-menu label="Item Type" value="{{typeselect}}">
-		  <paper-menu id="typemenu" class="dropdown-content">
+		  <paper-menu id="typemenu" class="dropdown-content" selected="0">
 		    <template is="dom-repeat" items="{{types}}">
 		    	<paper-item>{{item}}</paper-item>
 		    </template>
@@ -108,39 +111,42 @@
 			},
 			generateSlots: function(){
 				var menu = this.$.slotmenu;
-				this.slots = [];
+				var tempslots = [];
 				var filteredItems = _.filter(DIM.inventory, function(item){
 					return item.klass === this.classselect && this.itemFilter(item);
 				}, this);
 				_.each(filteredItems, function(item){
-					if (!_.contains(this.slots, item.bucket.bucketName)){
-						this.push("slots", item.bucket.bucketName);
+					if (!_.contains(tempslots, item.bucket.bucketName)){
+						tempslots.push(item.bucket.bucketName);
 					}
 				}, this);
-				this.slots = this.slots.sort();
-				this.async(function(){
-					menu.select("1");
-					menu.select("0");
-				});
+				tempslots = tempslots.sort();
+				this.slots = [];
+				setTimeout(function(){
+					this.slots = tempslots;
+				}.bind(this), 0);
+
 			},
 			generateTypes: function(){
 				// this.splice("types", 0, this.splice.length);
 				var menu = this.$.typemenu;
-				this.types = [];
+				var temptypes = [];
 				var filteredItems = _.filter(DIM.inventory, function(item){
 					return item.klass === this.classselect && item.bucket.bucketName === this.slotselect && this.itemFilter(item);
 				}, this);
 				// debugger
 				_.each(filteredItems, function(item){
-					if (!_.contains(this.types, item.typeName)){
-						this.push("types", item.typeName);
+					if (!_.contains(temptypes, item.typeName)){
+						temptypes.push(item.typeName);
 					}
 				}, this);
-				this.types = this.types.sort();
-				this.async(function(){
-					menu.select("1");
+				temptypes = temptypes.sort();
+				this.types = [];
+				setTimeout(function(){
+					this.types = temptypes;
 					menu.select("0");
-				});
+				}.bind(this),0);
+
 				
 			}
 		});

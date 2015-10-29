@@ -4,7 +4,7 @@
 
 <dom-module id="dim-app">
 	<template>
-		<my-inventory itemready="{{itemready}}"></my-inventory>
+		<my-inventory itemready="{{itemready}}" characters="{{characters}}"></my-inventory>
 	</template>
 
 	<script>
@@ -100,6 +100,13 @@
 
 			if (archetype.itemTypeName.match(/(.*) Artifact/) !== null){
 				className = archetype.itemTypeName.match(/(.*) Artifact/)[1];
+				if (className === "Titan"){
+					classType = 0;
+				} else if (className === "Hunter") {
+					classType = 1;
+				} else if (className === "Warlock") {
+					classType = 2;
+				}
 			} else {
 				if (classType === 0){
 					className = "Titan";
@@ -114,6 +121,7 @@
 		
 			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
+			normalizedItem.klassType = classType;
 			normalizedItem.bucket = {};
 			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
 			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;

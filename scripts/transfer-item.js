@@ -24,27 +24,77 @@ DIM.promiseWhile = function(body, start, end) {
 		direction = "right";
 		inc = 1;
 	}
+	start = start - inc;
 
-	function loop(start, end) {
+	function loop() {
+		if(arguments.length !== 0){
+			var res = JSON.parse(arguments[0].responseText);
+			console.log(res.Message);
+		}
+		start = start + inc;
     if (start === end) return done.resolve();
-    Q.when(body(start, end, direction), loop(start + inc, end), done.reject);
+    body(start, end, direction).then(loop, done.reject);
 	}
 
-	setTimeout(loop, 0, start, end);
+	setTimeout(loop, 0);
 
 	return done.promise;
 };
 
 DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 
-	var guy = _.find(DIM.charactersInv, function(guy){
-		return guy.characterId === charId;
+	//find all items in current pocket
+	var pocketItems = _.filter(DIM.inventory, function(item){
+		return (
+			item.location.name === charId &&
+			item.bucket.bucketHash === itemBucket &&
+			item.instanceId !== itemId &&
+			item.levelReq <= char.characterLevel &&
+			(item.klassType === char.characterBase.classType || item.klassType === 3)
+		);
 	});
-	var bucket = _.find(guy.buckets.Equippable, function(bucket){
-		return bucket.bucketHash === itemBucket;
-	});
-	debugger
 
+	pocketItems = pocketItems.sort(function(a, b){
+		var key = Object.keys(a.primaryStat)[0];
+		if(a.primaryStat[key] > b.primaryStat[key]){
+			return -1;
+		}
+		if(a.primaryStat[key] < b.primaryStat[key]){
+			return 1;
+		}
+		return 0;
+	});
+
+	if (pocketItems.length !== 0){
+		return DIM.equip(charId, pocketItems[0].instanceId);
+	}
+
+	var vaultItems = _.filter(DIM.inventory, function(item){
+		return (
+			item.location.name === "Vault" &&
+			item.bucket.bucketHash === itemBucket &&
+			item.levelReq <= char.characterLevel &&
+			(item.klassType === char.characterBase.classType || item.klassType === 3) &&
+			!item.typeName.includes("Engram") &&
+			!item.typeName.includes("Armsday")
+		);
+	});
+
+	vaultItems = vaultItems.sort(function(a, b){
+		var key = Object.keys(a.primaryStat)[0];
+		if(a.primaryStat[key] > b.primaryStat[key]){
+			return -1;
+		}
+		if(a.primaryStat[key] < b.primaryStat[key]){
+			return 1;
+		}
+		return 0;
+	});
+
+	if (vaultItems.length !== 0){
+		return DIM.fromVault(charId, itemId, itemHash).then(DIM.equip(charId, itemId));
+	}
+	
 };
 
 DIM.equip = function(charId, itemId){

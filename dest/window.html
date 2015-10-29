@@ -2319,6 +2319,8 @@ respectively.
 
 			.not-activated{
 				opacity: 0.2;
+				z-index: -1000;
+				position: relative;
 			}
 
 			.graph-title{
@@ -2345,11 +2347,14 @@ respectively.
 				background-color: black;
 				position: absolute;
 				display: none;
+				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+				font-size: 1.5vw;
+				font-weight: 200;
 				/*opacity: 0.5;*/
 			}
 
 			.charicon{
-				width: 20%;
+				width: 15%;
 				display: inline-block;
 			}
 
@@ -2370,21 +2375,25 @@ respectively.
 				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
 
 				<div id="store">
-					<div style="background-color: white;">Equip</div>
+					<div style="background-color: white; padding: 5px;">Equip</div>
 					<template is="dom-repeat" items="{{characters}}" as="character">
-						<div class="charicon">
-							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
-						</div>
+						<template is="dom-if" if="{{equipIconCondition(character)}}">
+							<div class="charicon">
+								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+							</div>
+						</template>
 					</template>
-					<div style="background-color: white;">Store</div>
+					<div style="background-color: white; padding: 5px;">Store</div>
 					<template is="dom-repeat" items="{{characters}}" as="character">
-						<div class="charicon">
-							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
-						</div>
+						<template is="dom-if" if="{{storeIconCondition(character)}}">
+							<div class="charicon">
+								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
+							</div>
+						</template>
 					</template>
-					<div class="charicon">
-						<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
-					</div>
+						<div id="vaultstoreicon" class="charicon">
+							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+						</div>
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -2394,9 +2403,9 @@ respectively.
 					<div class="talent-row">
 						<template is="dom-repeat" items="{{talentrow}}" as="talentcell">
 							<div class="talent-cell">
-								<template is="dom-if" if="{{iconCondition(talentcell)}}">
-									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
-								</template>
+								<!-- <template is="dom-if" if="{{iconCondition(talentcell)}}"> -->
+									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell)}}">
+								<!-- </template> -->
 								<template is="dom-if" if="{{talentcell.padding}}">
 									<img class="talent-image" src="../myicons/empty.png">
 								</template>
@@ -3403,7 +3412,10 @@ respectively.
 		<style>
 		:host {
 			display: block;
+			background-color: rgb(188,188,188);
+			padding-left: 20px;
 		}
+
 		</style>
 
 		<paper-dropdown-menu label="Class" value="{{classselect}}">
@@ -3415,7 +3427,7 @@ respectively.
 		</paper-dropdown-menu>
 
 		<paper-dropdown-menu label="Equipment Slot" value="{{slotselect}}">
-		  <paper-menu id="slotmenu" class="dropdown-content">
+		  <paper-menu id="slotmenu" class="dropdown-content" selected="0">
 		    <template is="dom-repeat" items="{{slots}}">
 		    	<paper-item>{{item}}</paper-item>
 		    </template>
@@ -3423,7 +3435,7 @@ respectively.
 		</paper-dropdown-menu>
 
 		<paper-dropdown-menu label="Item Type" value="{{typeselect}}">
-		  <paper-menu id="typemenu" class="dropdown-content">
+		  <paper-menu id="typemenu" class="dropdown-content" selected="0">
 		    <template is="dom-repeat" items="{{types}}">
 		    	<paper-item>{{item}}</paper-item>
 		    </template>
@@ -3443,7 +3455,7 @@ respectively.
 
 	</dom-module><dom-module id="dim-app" assetpath="/">
 	<template>
-		<my-inventory itemready="{{itemready}}"></my-inventory>
+		<my-inventory itemready="{{itemready}}" characters="{{characters}}"></my-inventory>
 	</template>
 
 	</dom-module></div>

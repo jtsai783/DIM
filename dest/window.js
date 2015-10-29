@@ -11352,10 +11352,30 @@ Polymer({
 Polymer({
 		is: "item-card",
 		properties: {
-			item: Object,
+			item: {
+				type: Object,
+				observer: "itemChanged"
+			},
 			maxval: Number,
 			maxrow: Number,
 			characters: Array
+		},
+		equipIconCondition: function(character){
+			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
+				return false;
+			}
+			return true;
+		},
+		storeIconCondition: function(character){
+			if (!this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
+				return false;
+			}
+			return true;
+		},
+		itemChanged: function(){
+			if (this.item.location.name === "Vault"){
+				this.$.vaultstoreicon.style.display = "none";
+			}
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -11410,7 +11430,8 @@ Polymer({
 			this.itemAction(e, "equip");
 		},
 		charIcon: function(character){
-			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			// return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			return "http://www.bungie.net/common/destiny_content/icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
 			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {
@@ -11431,23 +11452,27 @@ Polymer({
 				return item.location.icon;
 			} else {
 				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-				return "../icons/" + iconName;
+				return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 			}
 		},
 		iconCondition: function(talentcell){
 			return !!talentcell.icon && !talentcell.hidden;
 		},
 		itemIcon: function(iconFilename){
-			return "../icons/" + iconFilename;
+			// return "../icons/" + iconFilename;
+			return "http://www.bungie.net/common/destiny_content/icons/" + iconFilename;
 		},
 		toolTip: function(talentcell){
+			if (talentcell.hidden){
+				return "";
+			}
 			return talentcell.name + "\n" + talentcell.description;
 		},
-		perkIcon:function(iconName){
-			if (typeof iconName === "undefined"){
-				// debugger
+		perkIcon:function(talentcell){
+			if (typeof talentcell.icon === "undefined" || talentcell.hidden){
+				return "../myicons/empty.png";
 			}
-			return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
+			return "http://www.bungie.net/common/destiny_content/icons/" + talentcell.icon;
 		},
 		primaryStat: function(stat){
 			return _.values(stat)[0];
@@ -11485,7 +11510,7 @@ Polymer({
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
-			var graphHeight = (labels.length * 20)  + 40;
+			var graphHeight = (labels.length * 23)  + 15;
 			this.$.stats.height = graphHeight;
 			var data = {
 				labels: labels,
@@ -13629,45 +13654,49 @@ Polymer({
 			},
 			generateSlots: function(){
 				var menu = this.$.slotmenu;
-				this.slots = [];
+				var tempslots = [];
 				var filteredItems = _.filter(DIM.inventory, function(item){
 					return item.klass === this.classselect && this.itemFilter(item);
 				}, this);
 				_.each(filteredItems, function(item){
-					if (!_.contains(this.slots, item.bucket.bucketName)){
-						this.push("slots", item.bucket.bucketName);
+					if (!_.contains(tempslots, item.bucket.bucketName)){
+						tempslots.push(item.bucket.bucketName);
 					}
 				}, this);
-				this.slots = this.slots.sort();
-				this.async(function(){
-					menu.select("1");
-					menu.select("0");
-				});
+				tempslots = tempslots.sort();
+				this.slots = [];
+				setTimeout(function(){
+					this.slots = tempslots;
+				}.bind(this), 0);
+
 			},
 			generateTypes: function(){
 				// this.splice("types", 0, this.splice.length);
 				var menu = this.$.typemenu;
-				this.types = [];
+				var temptypes = [];
 				var filteredItems = _.filter(DIM.inventory, function(item){
 					return item.klass === this.classselect && item.bucket.bucketName === this.slotselect && this.itemFilter(item);
 				}, this);
 				// debugger
 				_.each(filteredItems, function(item){
-					if (!_.contains(this.types, item.typeName)){
-						this.push("types", item.typeName);
+					if (!_.contains(temptypes, item.typeName)){
+						temptypes.push(item.typeName);
 					}
 				}, this);
-				this.types = this.types.sort();
-				this.async(function(){
-					menu.select("1");
+				temptypes = temptypes.sort();
+				this.types = [];
+				setTimeout(function(){
+					this.types = temptypes;
 					menu.select("0");
-				});
+				}.bind(this),0);
+
 				
 			}
 		});
 Polymer({
 		is: "my-inventory",
 		properties: {
+			characters: Array,
 			displayitems: {
 				type: Array,
 				value: []
@@ -13704,7 +13733,7 @@ Polymer({
 				this.displayitems = temp;
 				this.getChartMaxValue();
 				this.padPerkGrid();
-			}.bind(this), 1000);
+			}.bind(this), 0);
 
 		},
 		invReady: function(){
@@ -13847,6 +13876,13 @@ Polymer({
 
 			if (archetype.itemTypeName.match(/(.*) Artifact/) !== null){
 				className = archetype.itemTypeName.match(/(.*) Artifact/)[1];
+				if (className === "Titan"){
+					classType = 0;
+				} else if (className === "Hunter") {
+					classType = 1;
+				} else if (className === "Warlock") {
+					classType = 2;
+				}
 			} else {
 				if (classType === 0){
 					className = "Titan";
@@ -13861,6 +13897,7 @@ Polymer({
 		
 			normalizedItem.typeName = archetype.itemTypeName;
 			normalizedItem.klass = className;
+			normalizedItem.klassType = classType;
 			normalizedItem.bucket = {};
 			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
 			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;

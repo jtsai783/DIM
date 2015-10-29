@@ -60,5 +60,5 @@ DIM.itemState[4] = {left: {
 	"action": "equip"
 }};
 DIM.itemState[5] = {left: {
-	"action": "uneqip"
+	"action": "unequip"
 }, right: {}};

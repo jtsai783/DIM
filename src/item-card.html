@@ -86,6 +86,8 @@
 
 			.not-activated{
 				opacity: 0.2;
+				z-index: -1000;
+				position: relative;
 			}
 
 			.graph-title{
@@ -112,11 +114,14 @@
 				background-color: black;
 				position: absolute;
 				display: none;
+				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+				font-size: 1.5vw;
+				font-weight: 200;
 				/*opacity: 0.5;*/
 			}
 
 			.charicon{
-				width: 20%;
+				width: 15%;
 				display: inline-block;
 			}
 
@@ -137,21 +142,25 @@
 				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
 
 				<div id="store">
-					<div style="background-color: white;">Equip</div>
+					<div style="background-color: white; padding: 5px;">Equip</div>
 					<template is="dom-repeat" items="{{characters}}" as="character">
-						<div class="charicon">
-							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
-						</div>
+						<template is="dom-if" if="{{equipIconCondition(character)}}">
+							<div class="charicon">
+								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+							</div>
+						</template>
 					</template>
-					<div style="background-color: white;">Store</div>
+					<div style="background-color: white; padding: 5px;">Store</div>
 					<template is="dom-repeat" items="{{characters}}" as="character">
-						<div class="charicon">
-							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
-						</div>
+						<template is="dom-if" if="{{storeIconCondition(character)}}">
+							<div class="charicon">
+								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
+							</div>
+						</template>
 					</template>
-					<div class="charicon">
-						<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
-					</div>
+						<div id="vaultstoreicon" class="charicon">
+							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+						</div>
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -161,9 +170,9 @@
 					<div class="talent-row">
 						<template is="dom-repeat" items="{{talentrow}}" as="talentcell">
 							<div class="talent-cell">
-								<template is="dom-if" if="{{iconCondition(talentcell)}}">
-									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell.icon)}}">
-								</template>
+								<!-- <template is="dom-if" if="{{iconCondition(talentcell)}}"> -->
+									<img title="{{toolTip(talentcell)}}" class$="{{imgClass(talentcell)}}" src="{{perkIcon(talentcell)}}">
+								<!-- </template> -->
 								<template is="dom-if" if="{{talentcell.padding}}">
 									<img class="talent-image" src="../myicons/empty.png">
 								</template>
@@ -181,10 +190,30 @@
 	Polymer({
 		is: "item-card",
 		properties: {
-			item: Object,
+			item: {
+				type: Object,
+				observer: "itemChanged"
+			},
 			maxval: Number,
 			maxrow: Number,
 			characters: Array
+		},
+		equipIconCondition: function(character){
+			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
+				return false;
+			}
+			return true;
+		},
+		storeIconCondition: function(character){
+			if (!this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
+				return false;
+			}
+			return true;
+		},
+		itemChanged: function(){
+			if (this.item.location.name === "Vault"){
+				this.$.vaultstoreicon.style.display = "none";
+			}
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -239,7 +268,8 @@
 			this.itemAction(e, "equip");
 		},
 		charIcon: function(character){
-			return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			// return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			return "http://www.bungie.net/common/destiny_content/icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
 			if (this.$.store.style.display === "" || this.$.store.style.display === "none") {
@@ -260,23 +290,27 @@
 				return item.location.icon;
 			} else {
 				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-				return "../icons/" + iconName;
+				return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 			}
 		},
 		iconCondition: function(talentcell){
 			return !!talentcell.icon && !talentcell.hidden;
 		},
 		itemIcon: function(iconFilename){
-			return "../icons/" + iconFilename;
+			// return "../icons/" + iconFilename;
+			return "http://www.bungie.net/common/destiny_content/icons/" + iconFilename;
 		},
 		toolTip: function(talentcell){
+			if (talentcell.hidden){
+				return "";
+			}
 			return talentcell.name + "\n" + talentcell.description;
 		},
-		perkIcon:function(iconName){
-			if (typeof iconName === "undefined"){
-				// debugger
+		perkIcon:function(talentcell){
+			if (typeof talentcell.icon === "undefined" || talentcell.hidden){
+				return "../myicons/empty.png";
 			}
-			return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
+			return "http://www.bungie.net/common/destiny_content/icons/" + talentcell.icon;
 		},
 		primaryStat: function(stat){
 			return _.values(stat)[0];
@@ -314,7 +348,7 @@
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
-			var graphHeight = (labels.length * 20)  + 40;
+			var graphHeight = (labels.length * 23)  + 15;
 			this.$.stats.height = graphHeight;
 			var data = {
 				labels: labels,
