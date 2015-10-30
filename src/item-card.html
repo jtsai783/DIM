@@ -29,7 +29,6 @@
 			}
 
 			#title{
-				/*min-height: 50px;*/
 				text-decoration: none;
 				display: block;
 				width: auto;
@@ -56,7 +55,6 @@
 
 			#light {
 				display: inline-block;
-				/*height: 100%;*/
 				margin: 10px;
 				color: white;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -65,7 +63,6 @@
 			}
 			#talent-grid{
 				max-width: 80%;
-				/*height: 200px;*/
 				margin-bottom: 15px;
 				margin-left: auto;
 				margin-right: auto;
@@ -76,7 +73,6 @@
 			}
 			.talent-cell{
 				display: inline-block;
-				/*background: red;*/
 				max-width: 50px;
 				width: 3vw;
 			}
@@ -93,7 +89,6 @@
 			.graph-title{
 				margin: auto;
 				width: -webkit-fit-content;
-				/*display: inline-block;*/
 				color: white;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 			}
@@ -110,14 +105,12 @@
 
 			#store{
 				width: 100%;
-				/*height: 150px;*/
 				background-color: black;
 				position: absolute;
 				display: none;
 				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 				font-size: 1.5vw;
 				font-weight: 200;
-				/*opacity: 0.5;*/
 			}
 
 			.charicon{
@@ -154,9 +147,6 @@
 							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
 						</div>
 					</template>
-<!-- 						<div id="vaultstoreicon" class="charicon">
-							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
-						</div> -->
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -186,24 +176,11 @@
 	Polymer({
 		is: "item-card",
 		properties: {
-			item: {
-				type: Object,
-				observer: "itemChanged"
-			},
+			item: Object,
 			maxval: Number,
 			maxrow: Number,
 			characters: Array
 		},
-		// observers: [
-		// 	'itemIsequippedChanged(item.isEquipped)',
-		// 	'itemLocationNameChanged(item.location.name)'
-		// ],
-		// itemIsequippedChanged:function(){
-		// 	console.log(arguments);
-		// },
-		// itemLocationNameChanged:function(){
-		// 	console.log(arguments);
-		// },
 		equipIcons: function(equipped, locName, characters){
 			if(typeof characters !== "undefined"){
 				return  _.filter(characters, function(character){
@@ -237,26 +214,6 @@
 			if(isEquipped){
 				return "border-color: gold;";
 			}
-		},
-		equipIconCondition: function(character){
-			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
-				return false;
-			}
-			return true;
-		},
-		storeIconCondition: function(character){
-			if (!this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
-				return false;
-			}
-			return true;
-		},
-		itemChanged: function(){
-			// if (this.item.location.name === "Vault"){
-			// 	this.$.vaultstoreicon.style.display = "none";
-			// }
-			// console.log("item changed triggered")
-			// // debugger
-			itemcard = this;
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -371,7 +328,6 @@
 					break;
 			}
 
-			
 			this.drawStat();
 		},
 		drawStat: function() {

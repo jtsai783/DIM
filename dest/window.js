@@ -11352,24 +11352,11 @@ Polymer({
 Polymer({
 		is: "item-card",
 		properties: {
-			item: {
-				type: Object,
-				observer: "itemChanged"
-			},
+			item: Object,
 			maxval: Number,
 			maxrow: Number,
 			characters: Array
 		},
-		// observers: [
-		// 	'itemIsequippedChanged(item.isEquipped)',
-		// 	'itemLocationNameChanged(item.location.name)'
-		// ],
-		// itemIsequippedChanged:function(){
-		// 	console.log(arguments);
-		// },
-		// itemLocationNameChanged:function(){
-		// 	console.log(arguments);
-		// },
 		equipIcons: function(equipped, locName, characters){
 			if(typeof characters !== "undefined"){
 				return  _.filter(characters, function(character){
@@ -11403,26 +11390,6 @@ Polymer({
 			if(isEquipped){
 				return "border-color: gold;";
 			}
-		},
-		equipIconCondition: function(character){
-			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
-				return false;
-			}
-			return true;
-		},
-		storeIconCondition: function(character){
-			if (!this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
-				return false;
-			}
-			return true;
-		},
-		itemChanged: function(){
-			// if (this.item.location.name === "Vault"){
-			// 	this.$.vaultstoreicon.style.display = "none";
-			// }
-			// console.log("item changed triggered")
-			// // debugger
-			itemcard = this;
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -11537,7 +11504,6 @@ Polymer({
 					break;
 			}
 
-			
 			this.drawStat();
 		},
 		drawStat: function() {
