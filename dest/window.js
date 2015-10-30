@@ -11360,6 +11360,50 @@ Polymer({
 			maxrow: Number,
 			characters: Array
 		},
+		// observers: [
+		// 	'itemIsequippedChanged(item.isEquipped)',
+		// 	'itemLocationNameChanged(item.location.name)'
+		// ],
+		// itemIsequippedChanged:function(){
+		// 	console.log(arguments);
+		// },
+		// itemLocationNameChanged:function(){
+		// 	console.log(arguments);
+		// },
+		equipIcons: function(equipped, locName, characters){
+			if(typeof characters !== "undefined"){
+				return  _.filter(characters, function(character){
+					if(this.item.isEquipped){
+						return character.characterBase.characterId !== this.item.location.name;
+					} else {
+						return true;
+					}
+				}.bind(this));
+			}
+		},
+		storeIcons: function(equipped, locName, characters){
+			if(typeof characters !== "undefined"){
+				var newChar = characters.slice(0);
+				newChar.push({
+					characterBase: {
+						characterId: "Vault"
+					}
+				});
+				return  _.filter(newChar, function(character){
+					if(!this.item.isEquipped){
+						return character.characterBase.characterId !== this.item.location.name;
+					} else {
+						return true;
+					}
+				}.bind(this));
+
+			}
+		},
+		locationIconBorder: function(isEquipped){
+			if(isEquipped){
+				return "border-color: gold;";
+			}
+		},
 		equipIconCondition: function(character){
 			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
 				return false;
@@ -11373,9 +11417,12 @@ Polymer({
 			return true;
 		},
 		itemChanged: function(){
-			if (this.item.location.name === "Vault"){
-				this.$.vaultstoreicon.style.display = "none";
-			}
+			// if (this.item.location.name === "Vault"){
+			// 	this.$.vaultstoreicon.style.display = "none";
+			// }
+			// console.log("item changed triggered")
+			// // debugger
+			itemcard = this;
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -11430,7 +11477,9 @@ Polymer({
 			this.itemAction(e, "equip");
 		},
 		charIcon: function(character){
-			// return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			if (character.characterBase.characterId === "Vault"){
+				return "../myicons/vault.png";
+			}
 			return "http://www.bungie.net/common/destiny_content/icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
@@ -11445,14 +11494,6 @@ Polymer({
 				return "talent-image";
 			} else {
 				return "talent-image not-activated";
-			}
-		},
-		locationIcon: function(item){
-			if (item.location.location === 2){
-				return item.location.icon;
-			} else {
-				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-				return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 			}
 		},
 		iconCondition: function(talentcell){
@@ -11496,9 +11537,7 @@ Polymer({
 					break;
 			}
 
-			if(this.item.isEquipped){
-				this.$.locationicon.style.borderColor = "gold";
-			}
+			
 			this.drawStat();
 		},
 		drawStat: function() {
@@ -13923,7 +13962,7 @@ Polymer({
 				locationIcon = "../myicons/vault.png";
 				locName = "Vault";
 			} else {
-				locationIcon = char.emblemPath;
+				locationIcon = "http://www.bungie.net/" + char.emblemPath;
 				locName = char.characterBase.characterId;
 			}
 

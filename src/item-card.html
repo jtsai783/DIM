@@ -139,28 +139,24 @@
 				<div id="light">
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
-				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
+				<img src="{{item.location.icon}}" id="locationicon" on-click="toggleStore" style$="{{locationIconBorder(item.isEquipped)}}">
 
 				<div id="store">
 					<div style="background-color: white; padding: 5px;">Equip</div>
-					<template is="dom-repeat" items="{{characters}}" as="character">
-						<template is="dom-if" if="{{equipIconCondition(character)}}">
-							<div class="charicon">
-								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
-							</div>
-						</template>
+					<template is="dom-repeat" items="{{equipIcons(item.isEquipped, item.location.name, characters)}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+						</div>
 					</template>
 					<div style="background-color: white; padding: 5px;">Store</div>
-					<template is="dom-repeat" items="{{characters}}" as="character">
-						<template is="dom-if" if="{{storeIconCondition(character)}}">
-							<div class="charicon">
-								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
-							</div>
-						</template>
-					</template>
-						<div id="vaultstoreicon" class="charicon">
-							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+					<template is="dom-repeat" items="{{storeIcons(item.isEquipped, item.location.name, characters)}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
 						</div>
+					</template>
+<!-- 						<div id="vaultstoreicon" class="charicon">
+							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+						</div> -->
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
@@ -198,6 +194,50 @@
 			maxrow: Number,
 			characters: Array
 		},
+		// observers: [
+		// 	'itemIsequippedChanged(item.isEquipped)',
+		// 	'itemLocationNameChanged(item.location.name)'
+		// ],
+		// itemIsequippedChanged:function(){
+		// 	console.log(arguments);
+		// },
+		// itemLocationNameChanged:function(){
+		// 	console.log(arguments);
+		// },
+		equipIcons: function(equipped, locName, characters){
+			if(typeof characters !== "undefined"){
+				return  _.filter(characters, function(character){
+					if(this.item.isEquipped){
+						return character.characterBase.characterId !== this.item.location.name;
+					} else {
+						return true;
+					}
+				}.bind(this));
+			}
+		},
+		storeIcons: function(equipped, locName, characters){
+			if(typeof characters !== "undefined"){
+				var newChar = characters.slice(0);
+				newChar.push({
+					characterBase: {
+						characterId: "Vault"
+					}
+				});
+				return  _.filter(newChar, function(character){
+					if(!this.item.isEquipped){
+						return character.characterBase.characterId !== this.item.location.name;
+					} else {
+						return true;
+					}
+				}.bind(this));
+
+			}
+		},
+		locationIconBorder: function(isEquipped){
+			if(isEquipped){
+				return "border-color: gold;";
+			}
+		},
 		equipIconCondition: function(character){
 			if (this.item.isEquipped && this.item.location.name === character.characterBase.characterId){
 				return false;
@@ -211,9 +251,12 @@
 			return true;
 		},
 		itemChanged: function(){
-			if (this.item.location.name === "Vault"){
-				this.$.vaultstoreicon.style.display = "none";
-			}
+			// if (this.item.location.name === "Vault"){
+			// 	this.$.vaultstoreicon.style.display = "none";
+			// }
+			// console.log("item changed triggered")
+			// // debugger
+			itemcard = this;
 		},
 		itemAction: function(e, actionType){
 			var that = this;
@@ -268,7 +311,9 @@
 			this.itemAction(e, "equip");
 		},
 		charIcon: function(character){
-			// return "../icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+			if (character.characterBase.characterId === "Vault"){
+				return "../myicons/vault.png";
+			}
 			return "http://www.bungie.net/common/destiny_content/icons/" + character.emblemPath.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
 		},
 		toggleStore: function (){
@@ -283,14 +328,6 @@
 				return "talent-image";
 			} else {
 				return "talent-image not-activated";
-			}
-		},
-		locationIcon: function(item){
-			if (item.location.location === 2){
-				return item.location.icon;
-			} else {
-				var iconName = item.location.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-				return "http://www.bungie.net/common/destiny_content/icons/" + iconName;
 			}
 		},
 		iconCondition: function(talentcell){
@@ -334,9 +371,7 @@
 					break;
 			}
 
-			if(this.item.isEquipped){
-				this.$.locationicon.style.borderColor = "gold";
-			}
+			
 			this.drawStat();
 		},
 		drawStat: function() {

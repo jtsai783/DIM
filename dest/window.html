@@ -2372,28 +2372,24 @@ respectively.
 				<div id="light">
 					<span>{{primaryStat(item.primaryStat)}}</span>		
 				</div>
-				<img src="{{locationIcon(item)}}" id="locationicon" on-click="toggleStore">
+				<img src="{{item.location.icon}}" id="locationicon" on-click="toggleStore" style$="{{locationIconBorder(item.isEquipped)}}">
 
 				<div id="store">
 					<div style="background-color: white; padding: 5px;">Equip</div>
-					<template is="dom-repeat" items="{{characters}}" as="character">
-						<template is="dom-if" if="{{equipIconCondition(character)}}">
-							<div class="charicon">
-								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
-							</div>
-						</template>
+					<template is="dom-repeat" items="{{equipIcons(item.isEquipped, item.location.name, characters)}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="equip">
+						</div>
 					</template>
 					<div style="background-color: white; padding: 5px;">Store</div>
-					<template is="dom-repeat" items="{{characters}}" as="character">
-						<template is="dom-if" if="{{storeIconCondition(character)}}">
-							<div class="charicon">
-								<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
-							</div>
-						</template>
-					</template>
-						<div id="vaultstoreicon" class="charicon">
-							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+					<template is="dom-repeat" items="{{storeIcons(item.isEquipped, item.location.name, characters)}}" as="character">
+						<div class="charicon">
+							<img name="{{character.characterBase.characterId}}" class="chariconimage" src="{{charIcon(character)}}" on-click="store">
 						</div>
+					</template>
+<!-- 						<div id="vaultstoreicon" class="charicon">
+							<img name="Vault" class="chariconimage" src="../myicons/vault.png" on-click="store">
+						</div> -->
 				</div>
 			</div>
 			<div class="graph-title">Current/[Base] Stat</div>
