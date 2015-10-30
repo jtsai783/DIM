@@ -12,6 +12,7 @@
 				maxval="{{chartMaxValue}}"
 				maxrow="{{gridMaxRow}}"
 				characters="{{characters}}"
+				id="id-{{item.id}}"
 			>
 			</item-card>
     </template>
@@ -45,9 +46,11 @@
 				observer: "filterChanged"
 			}
 		},
+		ready: function(){
+			DIM.invRef = this;
+		},
 		filterChanged: function(filter){
 			var temp = [];
-			// debugger
 			_.each(DIM.inventory, function(item){
 				if (item.klass === filter.klass && item.bucket.bucketName === filter.slot && item.typeName === filter.type) {
 					temp.push(item);

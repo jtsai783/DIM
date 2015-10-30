@@ -30,6 +30,7 @@ qwest.get('../api-manifest/stats.json')
 });
 
 DIM.inventory = [];
+DIM.invCount = 0;
 
 DIM.ignoredStats = ["Inventory Size", "Light"];
 

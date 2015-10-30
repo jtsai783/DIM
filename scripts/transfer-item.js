@@ -1,19 +1,55 @@
 var DIM = DIM || {};
 
-DIM.readyItemState = function(myName, destName){
-	var itemStateCopy = DIM.itemState;
+DIM.readyItemState = function(myName, destName, myIcon, destIcon){
+	var itemStateCopy = _.clone(DIM.itemState);
 	itemStateCopy[1].right.id = myName;
+	itemStateCopy[1].right.locName = myName;
+	itemStateCopy[1].right.isEquipped = false;
+	itemStateCopy[1].right.icon = myIcon;
+
+
 	itemStateCopy[2].left.id = myName;
+	itemStateCopy[2].left.locName = myName;
+	itemStateCopy[2].left.isEquipped = true;
+	itemStateCopy[2].left.icon = myIcon;
+
 	itemStateCopy[2].right.id = myName;
+	itemStateCopy[2].right.locName = "Vault";
+	itemStateCopy[2].right.isEquipped = false;
+	itemStateCopy[2].right.icon = "../myicons/vault.png";
+
+
 	itemStateCopy[3].left.id = myName;
+	itemStateCopy[3].left.locName = myName;
+	itemStateCopy[3].left.isEquipped = false;
+	itemStateCopy[3].left.icon = myIcon;
+
 	itemStateCopy[3].right.id = destName;
+	itemStateCopy[3].right.locName = destName;
+	itemStateCopy[3].right.isEquipped = false;
+	itemStateCopy[3].right.icon = destIcon;
+
+
 	itemStateCopy[4].left.id = destName;
+	itemStateCopy[4].left.locName = "Vault";
+	itemStateCopy[4].left.isEquipped = false;
+	itemStateCopy[4].left.icon = "../myicons/vault.png";
+
 	itemStateCopy[4].right.id = destName;
+	itemStateCopy[4].right.locName = destName;
+	itemStateCopy[4].right.isEquipped = true;
+	itemStateCopy[4].right.icon = destIcon;
+
+
 	itemStateCopy[5].left.id = destName;
+	itemStateCopy[5].left.locName = destName;
+	itemStateCopy[5].left.isEquipped = false;
+	itemStateCopy[5].left.icon = destIcon;
+
 	return itemStateCopy;
 };
 
-DIM.promiseWhile = function(body, start, end) {
+DIM.promiseWhile = function(body, start, end, card, itemState) {
 	var done = Q.defer();
 	var direction = null;
 	var inc = null;
@@ -30,6 +66,11 @@ DIM.promiseWhile = function(body, start, end) {
 		if(arguments.length !== 0){
 			var res = JSON.parse(arguments[0].responseText);
 			console.log(res.Message);
+			if (res.Message === "Ok"){
+				card.set("item.isEquipped", itemState[start][direction].isEquipped);
+				card.set("item.location.name", itemState[start][direction].locName);
+				card.set("item.location.icon", itemState[start][direction].icon);
+			}
 		}
 		start = start + inc;
     if (start === end) return done.resolve();
@@ -41,8 +82,7 @@ DIM.promiseWhile = function(body, start, end) {
 	return done.promise;
 };
 
-DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
-
+DIM.unequip = function(card, charId, itemId, itemHash, itemBucket, char){
 	//find all items in current pocket
 	var pocketItems = _.filter(DIM.inventory, function(item){
 		return (
@@ -66,7 +106,7 @@ DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 	});
 
 	if (pocketItems.length !== 0){
-		return DIM.equip(charId, pocketItems[0].instanceId);
+		return DIM.equip(card, charId, pocketItems[0].instanceId);
 	}
 
 	var vaultItems = _.filter(DIM.inventory, function(item){
@@ -91,13 +131,14 @@ DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 		return 0;
 	});
 
+
 	if (vaultItems.length !== 0){
-		return DIM.fromVault(charId, itemId, itemHash).then(DIM.equip(charId, itemId));
+		return DIM.fromVault(card, charId, vaultItems[0].instanceId, vaultItems[0].itemHash).then(DIM.equip(card, charId, vaultItems[0].instanceId));
 	}
 	
 };
 
-DIM.equip = function(charId, itemId){
+DIM.equip = function(card, charId, itemId){
 	var url = "https://www.bungie.net/Platform/Destiny/EquipItem/";
 	var dataHash = {
 		"membershipType": 1,
@@ -115,7 +156,7 @@ DIM.equip = function(charId, itemId){
 	return Q(postReq);
 };
 
-DIM.toVault = function(charId, itemId, itemHash){
+DIM.toVault = function(card, charId, itemId, itemHash){
 
 	var url = "https://www.bungie.net/Platform/Destiny/TransferItem/";
 	var dataHash = {
@@ -138,7 +179,7 @@ DIM.toVault = function(charId, itemId, itemHash){
 
 };
 
-DIM.fromVault = function(charId, itemId, itemHash){
+DIM.fromVault = function(card, charId, itemId, itemHash){
 
 	var url = "https://www.bungie.net/Platform/Destiny/TransferItem/";
 	var dataHash = {

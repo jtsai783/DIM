@@ -165,6 +165,8 @@
 			normalizedItem.itemHash = vaultItem.itemHash;
 			normalizedItem.transferStatus = vaultItem.transferStatus;
 			normalizedItem.levelReq = vaultItem.equipRequiredLevel;
+			normalizedItem.id = DIM.invCount;
+			DIM.invCount = DIM.invCount + 1;
 			return normalizedItem;
 		},
 		getStat: function(archetype) {

@@ -3434,7 +3434,7 @@ respectively.
 	<template>
 		<item-filter klass="{{classes}}" filters="{{filters}}"></item-filter>
 		<template is="dom-repeat" items="{{displayitems}}">
-			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="{{gridMaxRow}}" characters="{{characters}}">
+			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="{{gridMaxRow}}" characters="{{characters}}" id="id-{{item.id}}">
 			</item-card>
     </template>
 	</template>

@@ -11419,7 +11419,7 @@ Polymer({
 				}
 			}
 
-			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name);
+			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name, this.item.location.icon, e.currentTarget.src);
 			var itemId = this.item.instanceId;
 			var itemHash = this.item.itemHash;
 			var itemBucket = this.item.bucket.bucketHash;
@@ -11431,8 +11431,8 @@ Polymer({
 				console.log(start);
 				var action = itemState[start][direction]["action"];
 				var id = itemState[start][direction]["id"];
-				return DIM[action](id, itemId, itemHash, itemBucket, char);
-			},startState, endState)
+				return DIM[action](that, id, itemId, itemHash, itemBucket, char);
+			},startState, endState, this, itemState)
 			.then(function(){
 				console.log("done");
 			});
@@ -13725,9 +13725,11 @@ Polymer({
 				observer: "filterChanged"
 			}
 		},
+		ready: function(){
+			DIM.invRef = this;
+		},
 		filterChanged: function(filter){
 			var temp = [];
-			// debugger
 			_.each(DIM.inventory, function(item){
 				if (item.klass === filter.klass && item.bucket.bucketName === filter.slot && item.typeName === filter.type) {
 					temp.push(item);
@@ -13946,6 +13948,8 @@ Polymer({
 			normalizedItem.itemHash = vaultItem.itemHash;
 			normalizedItem.transferStatus = vaultItem.transferStatus;
 			normalizedItem.levelReq = vaultItem.equipRequiredLevel;
+			normalizedItem.id = DIM.invCount;
+			DIM.invCount = DIM.invCount + 1;
 			return normalizedItem;
 		},
 		getStat: function(archetype) {

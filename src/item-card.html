@@ -243,7 +243,7 @@
 				}
 			}
 
-			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name);
+			var itemState = DIM.readyItemState(this.item.location.name, e.currentTarget.name, this.item.location.icon, e.currentTarget.src);
 			var itemId = this.item.instanceId;
 			var itemHash = this.item.itemHash;
 			var itemBucket = this.item.bucket.bucketHash;
@@ -255,8 +255,8 @@
 				console.log(start);
 				var action = itemState[start][direction]["action"];
 				var id = itemState[start][direction]["id"];
-				return DIM[action](id, itemId, itemHash, itemBucket, char);
-			},startState, endState)
+				return DIM[action](that, id, itemId, itemHash, itemBucket, char);
+			},startState, endState, this, itemState)
 			.then(function(){
 				console.log("done");
 			});
