@@ -11431,7 +11431,7 @@ Polymer({
 				console.log(start);
 				var action = itemState[start][direction]["action"];
 				var id = itemState[start][direction]["id"];
-				return DIM[action](that, id, itemId, itemHash, itemBucket, char);
+				return DIM[action](id, itemId, itemHash, itemBucket, char);
 			},startState, endState, this, itemState)
 			.then(function(){
 				console.log("done");

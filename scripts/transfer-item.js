@@ -82,7 +82,7 @@ DIM.promiseWhile = function(body, start, end, card, itemState) {
 	return done.promise;
 };
 
-DIM.unequip = function(card, charId, itemId, itemHash, itemBucket, char){
+DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 	//find all items in current pocket
 	var pocketItems = _.filter(DIM.inventory, function(item){
 		return (
@@ -106,7 +106,24 @@ DIM.unequip = function(card, charId, itemId, itemHash, itemBucket, char){
 	});
 
 	if (pocketItems.length !== 0){
-		return DIM.equip(card, charId, pocketItems[0].instanceId);
+		// var pivot = pocketItems[0];
+		// var itemOnPage = DIM.invRef.$$("#id-" + pivot.id);
+		// if(itemOnPage){
+		// 	var state = {
+		// 		2: {
+		// 			left: {
+		// 				locName: charId,
+		// 				isEquipped: true,
+		// 				icon: "http://www.bungie.net/" + char.emblemPath
+		// 			}
+		// 		}
+		// 	};
+		// 	debugger
+		// 	DIM.promiseWhile(function(){
+		// 		return DIM.equip(charId, pivot.instanceId);
+		// 	}, 2, 1, itemOnPage, state);
+		// }
+		// return DIM.equip(card, charId, pocketItems[0].instanceId);
 	}
 
 	var vaultItems = _.filter(DIM.inventory, function(item){
@@ -133,12 +150,12 @@ DIM.unequip = function(card, charId, itemId, itemHash, itemBucket, char){
 
 
 	if (vaultItems.length !== 0){
-		return DIM.fromVault(card, charId, vaultItems[0].instanceId, vaultItems[0].itemHash).then(DIM.equip(card, charId, vaultItems[0].instanceId));
+		// return DIM.fromVault(card, charId, vaultItems[0].instanceId, vaultItems[0].itemHash).then(DIM.equip(card, charId, vaultItems[0].instanceId));
 	}
 	
 };
 
-DIM.equip = function(card, charId, itemId){
+DIM.equip = function(charId, itemId){
 	var url = "https://www.bungie.net/Platform/Destiny/EquipItem/";
 	var dataHash = {
 		"membershipType": 1,
@@ -156,7 +173,7 @@ DIM.equip = function(card, charId, itemId){
 	return Q(postReq);
 };
 
-DIM.toVault = function(card, charId, itemId, itemHash){
+DIM.toVault = function(charId, itemId, itemHash){
 
 	var url = "https://www.bungie.net/Platform/Destiny/TransferItem/";
 	var dataHash = {
@@ -179,7 +196,7 @@ DIM.toVault = function(card, charId, itemId, itemHash){
 
 };
 
-DIM.fromVault = function(card, charId, itemId, itemHash){
+DIM.fromVault = function(charId, itemId, itemHash){
 
 	var url = "https://www.bungie.net/Platform/Destiny/TransferItem/";
 	var dataHash = {
