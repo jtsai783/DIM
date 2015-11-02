@@ -94,16 +94,7 @@ DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 		);
 	});
 
-	pocketItems = pocketItems.sort(function(a, b){
-		var key = Object.keys(a.primaryStat)[0];
-		if(a.primaryStat[key] > b.primaryStat[key]){
-			return -1;
-		}
-		if(a.primaryStat[key] < b.primaryStat[key]){
-			return 1;
-		}
-		return 0;
-	});
+	
 
 	if (pocketItems.length !== 0){
 		// var pivot = pocketItems[0];
@@ -123,7 +114,17 @@ DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 		// 		return DIM.equip(charId, pivot.instanceId);
 		// 	}, 2, 1, itemOnPage, state);
 		// }
-		// return DIM.equip(card, charId, pocketItems[0].instanceId);
+		pocketItems = pocketItems.sort(function(a, b){
+			var key = Object.keys(a.primaryStat)[0];
+			if(a.primaryStat[key] > b.primaryStat[key]){
+				return -1;
+			}
+			if(a.primaryStat[key] < b.primaryStat[key]){
+				return 1;
+			}
+			return 0;
+		});
+		return DIM.equip(charId, pocketItems[0].instanceId);
 	}
 
 	var vaultItems = _.filter(DIM.inventory, function(item){
@@ -137,20 +138,21 @@ DIM.unequip = function(charId, itemId, itemHash, itemBucket, char){
 		);
 	});
 
-	vaultItems = vaultItems.sort(function(a, b){
-		var key = Object.keys(a.primaryStat)[0];
-		if(a.primaryStat[key] > b.primaryStat[key]){
-			return -1;
-		}
-		if(a.primaryStat[key] < b.primaryStat[key]){
-			return 1;
-		}
-		return 0;
-	});
+
 
 
 	if (vaultItems.length !== 0){
-		// return DIM.fromVault(card, charId, vaultItems[0].instanceId, vaultItems[0].itemHash).then(DIM.equip(card, charId, vaultItems[0].instanceId));
+		vaultItems = vaultItems.sort(function(a, b){
+			var key = Object.keys(a.primaryStat)[0];
+			if(a.primaryStat[key] > b.primaryStat[key]){
+				return -1;
+			}
+			if(a.primaryStat[key] < b.primaryStat[key]){
+				return 1;
+			}
+			return 0;
+		});
+		return DIM.fromVault(charId, vaultItems[0].instanceId, vaultItems[0].itemHash).then(DIM.equip(charId, vaultItems[0].instanceId));
 	}
 	
 };

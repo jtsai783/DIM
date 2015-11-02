@@ -2315,7 +2315,7 @@ respectively.
 
 			.not-activated{
 				opacity: 0.2;
-				z-index: -1000;
+				/*z-index: -1000;*/
 				position: relative;
 			}
 
@@ -2367,7 +2367,7 @@ respectively.
 				</div>
 				<img src="{{item.location.icon}}" id="locationicon" on-click="toggleStore" style$="{{locationIconBorder(item.isEquipped)}}">
 
-				<div id="store">
+				<div id="store" style="z-index: 1000; position: absolute;">
 					<div style="background-color: white; padding: 5px;">Equip</div>
 					<template is="dom-repeat" items="{{equipIcons(item.isEquipped, item.location.name, characters)}}" as="character">
 						<div class="charicon">
@@ -3433,7 +3433,7 @@ respectively.
 
 	<template>
 		<item-filter klass="{{classes}}" filters="{{filters}}"></item-filter>
-		<template is="dom-repeat" items="{{displayitems}}">
+		<template is="dom-repeat" items="{{displayitems}}" sort="itemSort">
 			<item-card item="{{item}}" maxval="{{chartMaxValue}}" maxrow="{{gridMaxRow}}" characters="{{characters}}" id="id-{{item.id}}">
 			</item-card>
     </template>

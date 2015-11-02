@@ -82,7 +82,7 @@
 
 			.not-activated{
 				opacity: 0.2;
-				z-index: -1000;
+				/*z-index: -1000;*/
 				position: relative;
 			}
 
@@ -134,7 +134,7 @@
 				</div>
 				<img src="{{item.location.icon}}" id="locationicon" on-click="toggleStore" style$="{{locationIconBorder(item.isEquipped)}}">
 
-				<div id="store">
+				<div id="store" style="z-index: 1000; position: absolute;">
 					<div style="background-color: white; padding: 5px;">Equip</div>
 					<template is="dom-repeat" items="{{equipIcons(item.isEquipped, item.location.name, characters)}}" as="character">
 						<div class="charicon">
@@ -339,7 +339,8 @@
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
-			var graphHeight = (labels.length * 23)  + 15;
+			var graphHeight = (labels.length * 23)  + 30;
+			// debugger
 			this.$.stats.height = graphHeight;
 			var data = {
 				labels: labels,

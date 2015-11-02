@@ -11515,7 +11515,8 @@ Polymer({
 			labels = _.map(labels, function(label){
 				return label.toUpperCase();
 			});
-			var graphHeight = (labels.length * 23)  + 15;
+			var graphHeight = (labels.length * 23)  + 30;
+			// debugger
 			this.$.stats.height = graphHeight;
 			var data = {
 				labels: labels,
@@ -13751,7 +13752,12 @@ Polymer({
 			}, this);
 		},
 		itemSort: function(a, b){
-			return b.stats.Range - a.stats.Range;
+			var aLight = a.primaryStat[_.keys(a.primaryStat)[0]];
+			var bLight = b.primaryStat[_.keys(b.primaryStat)[0]];
+
+			if (aLight > bLight) return -1;
+			if (aLight < bLight) return 1;
+			if (aLight === bLight) return 0; 
 		},
 		itemFilter: function(item){
 			return item.bucket.bucketName === "Leg Armor";
