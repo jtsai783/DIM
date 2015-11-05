@@ -61,6 +61,11 @@
 				font-size: 5vw;
 				font-weight: 500;
 			}
+
+			::-webkit-scrollbar { 
+    		display: none; 
+   		}
+
 			#talent-grid{
 				max-width: 80%;
 				margin-bottom: 15px;
@@ -263,9 +268,11 @@
 		},
 		store: function(e){
 			this.itemAction(e, "store");
+			this.toggleStore();
 		},
 		equip: function(e){
 			this.itemAction(e, "equip");
+			this.toggleStore();
 		},
 		charIcon: function(character){
 			if (character.characterBase.characterId === "Vault"){

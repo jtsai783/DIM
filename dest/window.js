@@ -11439,9 +11439,11 @@ Polymer({
 		},
 		store: function(e){
 			this.itemAction(e, "store");
+			this.toggleStore();
 		},
 		equip: function(e){
 			this.itemAction(e, "equip");
+			this.toggleStore();
 		},
 		charIcon: function(character){
 			if (character.characterBase.characterId === "Vault"){
