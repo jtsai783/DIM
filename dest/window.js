@@ -13885,6 +13885,10 @@ Polymer({
 		},
 		normalizeItem: function(vaultItem, char) {
 			var archetype = DIM.items[vaultItem.itemHash];
+			if (typeof archetype === "undefined") {
+				console.log("item not found");
+				console.log(vaultItem);
+			}
 			var normalizedItem = {};
 			var classType = archetype.classType;
 			var className = "";
