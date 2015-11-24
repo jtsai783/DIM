@@ -191,7 +191,7 @@
 						var step = node.steps[currentItemNode.stepIndex];
 						var nodeObj = {};
 						nodeObj.name = step.nodeStepName;
-						nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+						nodeObj.icon = step.icon;
 						nodeObj.description = step.nodeStepDescription;
 						nodeObj.hidden = currentItemNode.hidden;
 						nodeObj.isActivated = currentItemNode.isActivated;

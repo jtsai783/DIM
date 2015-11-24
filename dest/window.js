@@ -11482,7 +11482,7 @@ Polymer({
 			if (typeof talentcell.icon === "undefined" || talentcell.hidden){
 				return "../myicons/empty.png";
 			}
-			return "http://www.bungie.net/common/destiny_content/icons/" + talentcell.icon;
+			return "http://www.bungie.net/" + talentcell.icon;
 		},
 		primaryStat: function(stat){
 			return _.values(stat)[0];
@@ -13982,7 +13982,7 @@ Polymer({
 						var step = node.steps[currentItemNode.stepIndex];
 						var nodeObj = {};
 						nodeObj.name = step.nodeStepName;
-						nodeObj.icon = step.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+						nodeObj.icon = step.icon;
 						nodeObj.description = step.nodeStepDescription;
 						nodeObj.hidden = currentItemNode.hidden;
 						nodeObj.isActivated = currentItemNode.isActivated;
