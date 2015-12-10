@@ -13754,7 +13754,7 @@ Polymer({
 			}, this);
 		},
 		itemSort: function(a, b){
-			if (typeof a.primaryStat === 'undefined' || typeof b.primaryStat === 'undefined'){
+			if (typeof a.primaryStat === 'undefined' || typeof b.primaryStat === 'undefined' ){
 				return 0;
 			}
 			var aLight = a.primaryStat[_.keys(a.primaryStat)[0]];
