@@ -41,7 +41,10 @@
 				});
 				_.each(charInv.buckets.Equippable,function(bucket){
 					_.each(bucket.items, function(item){
-						DIM.inventory.push(this.normalizeItem(item, guy));
+						var tempItem = this.normalizeItem(item, guy);
+						if (typeof tempItem !== "undefined"){
+							DIM.inventory.push(tempItem);
+						}
 					}.bind(this));
 				}.bind(this)) ;
 			}.bind(this));
@@ -51,7 +54,10 @@
 			var vaultInv = JSON.parse(xhr.response).Response.data;
 			_.each(vaultInv.inventory.buckets.Item, function(bucket){
 				_.each(bucket.items, function(item){
-					DIM.inventory.push(this.normalizeItem(item));
+						var tempItem = this.normalizeItem(item);
+						if (typeof tempItem !== "undefined"){
+							DIM.inventory.push(tempItem);
+						}
 				}.bind(this));
 			}.bind(this));
 			this.characters = vaultInv.characters;
@@ -97,81 +103,82 @@
 			if (typeof archetype === "undefined") {
 				console.log("item not found");
 				console.log(vaultItem);
-			}
-			var normalizedItem = {};
-			var classType = archetype.classType;
-			var className = "";
-
-			if (archetype.itemTypeName.match(/(.*) Artifact/) !== null){
-				className = archetype.itemTypeName.match(/(.*) Artifact/)[1];
-				if (className === "Titan"){
-					classType = 0;
-				} else if (className === "Hunter") {
-					classType = 1;
-				} else if (className === "Warlock") {
-					classType = 2;
-				}
 			} else {
-				if (classType === 0){
-					className = "Titan";
-				} else if (classType === 1) {
-					className = "Hunter";
-				} else if (classType === 2) {
-					className = "Warlock";
-				} else if (classType === 3) {
-					className = "All";
-				}
-			}
-		
-			normalizedItem.typeName = archetype.itemTypeName;
-			normalizedItem.klass = className;
-			normalizedItem.klassType = classType;
-			normalizedItem.bucket = {};
-			normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
-			normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;
-			normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
-			normalizedItem.stats = this.getStat(vaultItem);
-			var baseStat = this.getStat(archetype);
-			var hStat = _.omit(baseStat, _.keys(normalizedItem.stats));
-			baseStat = _.pick(baseStat, _.keys(normalizedItem.stats));
-			normalizedItem.baseStat = baseStat;
-			hStat = _.omit(hStat, DIM.ignoredStats);
-			if (typeof vaultItem.primaryStat !== "undefined"){
-				var pStat = DIM.stats[vaultItem.primaryStat.statHash].statName;
-				var pVal = vaultItem.primaryStat.value;
-				normalizedItem.primaryStat = {};
-				normalizedItem.primaryStat[pStat] = pVal;
-				hStat = _.omit(hStat, _.keys(normalizedItem.primaryStat));
-			}
-			normalizedItem.hiddenStats = hStat;
-			normalizedItem.name = DIM.items[vaultItem.itemHash].itemName;
-			
-			var locationIcon, locName;
-			if (vaultItem.location === 2) {
-				locationIcon = "../myicons/vault.png";
-				locName = "Vault";
-			} else {
-				locationIcon = "http://www.bungie.net/" + char.emblemPath;
-				locName = char.characterBase.characterId;
-			}
+				var normalizedItem = {};
+				var classType = archetype.classType;
+				var className = "";
 
-			var location = {
-				location: vaultItem.location,
-				name: locName,
-				icon: locationIcon
-			};
+				if (archetype.itemTypeName.match(/(.*) Artifact/) !== null){
+					className = archetype.itemTypeName.match(/(.*) Artifact/)[1];
+					if (className === "Titan"){
+						classType = 0;
+					} else if (className === "Hunter") {
+						classType = 1;
+					} else if (className === "Warlock") {
+						classType = 2;
+					}
+				} else {
+					if (classType === 0){
+						className = "Titan";
+					} else if (classType === 1) {
+						className = "Hunter";
+					} else if (classType === 2) {
+						className = "Warlock";
+					} else if (classType === 3) {
+						className = "All";
+					}
+				}
 			
-			normalizedItem.location = location;
-			normalizedItem.talentGrid = this.getTalent(vaultItem);
-			normalizedItem.isEquipped = vaultItem.isEquipped;
-			normalizedItem.damageType = DIM.damageType[vaultItem.damageType];
-			normalizedItem.instanceId = vaultItem.itemInstanceId;
-			normalizedItem.itemHash = vaultItem.itemHash;
-			normalizedItem.transferStatus = vaultItem.transferStatus;
-			normalizedItem.levelReq = vaultItem.equipRequiredLevel;
-			normalizedItem.id = DIM.invCount;
-			DIM.invCount = DIM.invCount + 1;
-			return normalizedItem;
+				normalizedItem.typeName = archetype.itemTypeName;
+				normalizedItem.klass = className;
+				normalizedItem.klassType = classType;
+				normalizedItem.bucket = {};
+				normalizedItem.bucket.bucketHash = archetype.bucketTypeHash;
+				normalizedItem.bucket.bucketName = DIM.buckets[archetype.bucketTypeHash].bucketName;
+				normalizedItem.icon = archetype.icon.match(/common\/destiny_content\/icons\/(.*\..*)/)[1];
+				normalizedItem.stats = this.getStat(vaultItem);
+				var baseStat = this.getStat(archetype);
+				var hStat = _.omit(baseStat, _.keys(normalizedItem.stats));
+				baseStat = _.pick(baseStat, _.keys(normalizedItem.stats));
+				normalizedItem.baseStat = baseStat;
+				hStat = _.omit(hStat, DIM.ignoredStats);
+				if (typeof vaultItem.primaryStat !== "undefined"){
+					var pStat = DIM.stats[vaultItem.primaryStat.statHash].statName;
+					var pVal = vaultItem.primaryStat.value;
+					normalizedItem.primaryStat = {};
+					normalizedItem.primaryStat[pStat] = pVal;
+					hStat = _.omit(hStat, _.keys(normalizedItem.primaryStat));
+				}
+				normalizedItem.hiddenStats = hStat;
+				normalizedItem.name = DIM.items[vaultItem.itemHash].itemName;
+				
+				var locationIcon, locName;
+				if (vaultItem.location === 2) {
+					locationIcon = "../myicons/vault.png";
+					locName = "Vault";
+				} else {
+					locationIcon = "http://www.bungie.net/" + char.emblemPath;
+					locName = char.characterBase.characterId;
+				}
+
+				var location = {
+					location: vaultItem.location,
+					name: locName,
+					icon: locationIcon
+				};
+				
+				normalizedItem.location = location;
+				normalizedItem.talentGrid = this.getTalent(vaultItem);
+				normalizedItem.isEquipped = vaultItem.isEquipped;
+				normalizedItem.damageType = DIM.damageType[vaultItem.damageType];
+				normalizedItem.instanceId = vaultItem.itemInstanceId;
+				normalizedItem.itemHash = vaultItem.itemHash;
+				normalizedItem.transferStatus = vaultItem.transferStatus;
+				normalizedItem.levelReq = vaultItem.equipRequiredLevel;
+				normalizedItem.id = DIM.invCount;
+				DIM.invCount = DIM.invCount + 1;
+				return normalizedItem;
+			}
 		},
 		getStat: function(archetype) {
 			var friendlyStats = {};
