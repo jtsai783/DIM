@@ -1,6 +1,8 @@
 # DIM
 
-![Alt text](https://flsyqa-sn3301.files.1drv.com/y3mLGSbIFYAiy0u-F8oYYDtv4uvSLfSd7cA7XsQRWA8gv2hSD2yVoMo7ICDNMuBrtDSf8Fvw557UMNpDxGmilk80Z0FPiVXj-foGK3Z32z27KO5gjCCG-JnUHGkqNio5Zmmqu-_3jB188O16iBmACyLeeGTf0_7ZbBN2CUNUHDn81o?width=2560&height=1600&cropmode=none "Optional title")
+![check out these guns](https://flsyqa-sn3301.files.1drv.com/y3mLGSbIFYAiy0u-F8oYYDtv4uvSLfSd7cA7XsQRWA8gv2hSD2yVoMo7ICDNMuBrtDSf8Fvw557UMNpDxGmilk80Z0FPiVXj-foGK3Z32z27KO5gjCCG-JnUHGkqNio5Zmmqu-_3jB188O16iBmACyLeeGTf0_7ZbBN2CUNUHDn81o?width=2560&height=1600&cropmode=none)
+
+![dropdown menu](https://fluxhw-sn3301.files.1drv.com/y3mNfyayP0pASXAUxenf5GS32u92uhty4hY7-MZ8HaJVRoYvjsXSaIT-6Db13sL5ntILyrmMv4wwqzUbbqDky0XBVrFcS8Q19bl9wzmrYrfn4hP_gTmZQH6d4d2JAe9b69sZlwssSQwen3fFKCMb-VqARKEywlPnJGrwb0gYaD3UZ4?width=2560&height=1600&cropmode=none)
 
 A destiny inventory manager written as both a tool for personal use an learning exercise. This is written as a chrome using google's polymer extention to sidestep the issue of user authentication.
 
