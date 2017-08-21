@@ -1,6 +1,6 @@
 # DIM
 
-[![Check out these guns!](https://i.imgur.com/ESJDJXo.jpg)]
+![Check out these guns!](https://i.imgur.com/ESJDJXo.jpg)
 
 
 A destiny inventory manager written as both a tool for personal use an learning exercise. This is written as a chrome extension using Google's Polymer to sidestep the issue of user authentication.
